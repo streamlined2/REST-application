@@ -29,14 +29,6 @@ import lombok.ToString;
 @ToString
 public class Person {
 
-	public enum Sex {
-		FEMALE, MALE
-	}
-
-	public enum Color {
-		GRAY, GREEN, BLUE, BLACK, BROWN, RED, YELLOW
-	}
-
 	@EqualsAndHashCode.Include
 	@NotBlank(message = "Person name should not be blank")
 	@Size(min = 3, message = "Person name should be of length 3 or greater")
