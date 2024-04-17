@@ -22,25 +22,23 @@ import lombok.ToString;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Country {
 
-	public enum Continent {
-		AFRICA, ASIA, EUROPE, NORTH_AMERICA, SOUTH_AMERICA, ANTARCTICA, AUSTRALIA
-	}
-
 	@EqualsAndHashCode.Include
+	private Long id;
+
 	@NotBlank(message = "Country name should not be blank")
 	@Size(min = 3, message = "Country name must be of length 3 or greater")
 	private String name;
-	
+
 	@NotNull(message = "Country continent should not be null")
 	private Continent continent;
-	
+
 	@NotBlank(message = "Country capital should not be blank")
 	@Size(min = 3, message = "Country capital must be of length 3 or greater")
 	private String capital;
-	
+
 	@Positive(message = "Country population should be positive value")
 	private int population;
-	
+
 	@Positive(message = "Country square should be positive value")
 	private double square;
 

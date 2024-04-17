@@ -30,11 +30,12 @@ import lombok.ToString;
 public class Person {
 
 	@EqualsAndHashCode.Include
+	private Long id;
+
 	@NotBlank(message = "Person name should not be blank")
 	@Size(min = 3, message = "Person name should be of length 3 or greater")
 	private String name;
 
-	@EqualsAndHashCode.Include
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	@NotNull(message = "Person birthday should not be null")
 	@Past(message = "Person birthday should belong to past")
