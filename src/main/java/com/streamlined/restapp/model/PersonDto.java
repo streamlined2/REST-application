@@ -8,7 +8,7 @@ import lombok.Builder;
 
 @Builder
 public record PersonDto(Long id, String name, LocalDate birthday, Sex sex, Color eyeColor, Color hairColor,
-		BigDecimal weight, BigDecimal height, Country countryOfOrigin, Country citizenship, String favoriteMeals) {
+		BigDecimal weight, BigDecimal height, CountryDto countryOfOrigin, CountryDto citizenship, String favoriteMeals) {
 
 	@Override
 	public boolean equals(Object obj) {

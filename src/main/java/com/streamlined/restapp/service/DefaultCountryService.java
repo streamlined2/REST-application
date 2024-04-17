@@ -3,9 +3,9 @@ package com.streamlined.restapp.service;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.springframework.data.util.Streamable;
 import org.springframework.stereotype.Service;
 
+import com.streamlined.restapp.Utilities;
 import com.streamlined.restapp.dao.CountryRepository;
 import com.streamlined.restapp.model.CountryDto;
 import com.streamlined.restapp.model.CountryMapper;
@@ -21,7 +21,7 @@ public class DefaultCountryService implements CountryService {
 
 	@Override
 	public Stream<CountryDto> getAllCountries() {
-		return Streamable.of(countryRepository.findAll()).map(countryMapper::toDto).stream();
+		return Utilities.stream(countryRepository.findAll()).map(countryMapper::toDto);
 	}
 
 	@Override

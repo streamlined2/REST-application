@@ -3,9 +3,9 @@ package com.streamlined.restapp.service;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.springframework.data.util.Streamable;
 import org.springframework.stereotype.Service;
 
+import com.streamlined.restapp.Utilities;
 import com.streamlined.restapp.dao.PersonRepository;
 import com.streamlined.restapp.model.PersonDto;
 import com.streamlined.restapp.model.PersonMapper;
@@ -21,7 +21,7 @@ public class DefaultPersonService implements PersonService {
 
 	@Override
 	public Stream<PersonDto> getAllPersons() {
-		return Streamable.of(personRepository.findAll()).map(personMapper::toDto).stream();
+		return Utilities.stream(personRepository.findAll()).map(personMapper::toDto);
 	}
 
 	@Override
