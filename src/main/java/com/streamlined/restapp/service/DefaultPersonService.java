@@ -10,6 +10,7 @@ import com.streamlined.restapp.dao.PersonRepository;
 import com.streamlined.restapp.model.PersonDto;
 import com.streamlined.restapp.model.PersonMapper;
 
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -18,6 +19,7 @@ public class DefaultPersonService implements PersonService {
 
 	private final PersonRepository personRepository;
 	private final PersonMapper personMapper;
+	private final Validator validator;
 
 	@Override
 	public Stream<PersonDto> getAllPersons() {
@@ -36,7 +38,9 @@ public class DefaultPersonService implements PersonService {
 
 	@Override
 	public PersonDto save(Long id, PersonDto person) {
-		return personMapper.toDto(personRepository.save(id, personMapper.toEntity(person)));
+		var entity = personMapper.toEntity(person);
+		Utilities.checkIfValid(validator, entity, "person");
+		return personMapper.toDto(personRepository.save(id, entity));
 	}
 
 	@Override

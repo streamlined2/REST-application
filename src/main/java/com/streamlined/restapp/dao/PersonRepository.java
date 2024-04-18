@@ -4,10 +4,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
+import com.streamlined.restapp.exception.EntityNotFoundException;
+import com.streamlined.restapp.exception.IncorrectDataException;
 import com.streamlined.restapp.model.Color;
 import com.streamlined.restapp.model.Person;
 import com.streamlined.restapp.model.Sex;
@@ -88,12 +91,26 @@ public class PersonRepository {
 	}
 
 	public Person save(Long id, Person person) {
+		if (isDuplicatePersonNameAndBirthday(id, person)) {
+			throw new IncorrectDataException("Person list already contains name and birthday: %s %s"
+					.formatted(person.getName(), person.getBirthday()));
+		}
 		person.setId(id);
 		persons.put(id, person);
 		return person;
 	}
 
+	private boolean isDuplicatePersonNameAndBirthday(Long id, Person person) {
+		return !persons.values().stream()
+				.filter(c -> !Objects.equals(c.getId(), id) && Objects.equals(c.getName(), person.getName())
+						&& Objects.equals(c.getBirthday(), person.getBirthday()))
+				.findAny().isEmpty();
+	}
+
 	public void deleteById(Long id) {
+		if (findById(id).isEmpty()) {
+			throw new EntityNotFoundException("Person with id %d not found".formatted(id));
+		}
 		persons.remove(id);
 	}
 

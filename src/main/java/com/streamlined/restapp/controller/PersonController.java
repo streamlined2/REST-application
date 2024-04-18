@@ -11,49 +11,47 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriComponentsBuilder;
-
 import com.streamlined.restapp.Utilities;
 import com.streamlined.restapp.exception.EntityNotFoundException;
-import com.streamlined.restapp.model.CountryDto;
-import com.streamlined.restapp.service.CountryService;
+import com.streamlined.restapp.model.PersonDto;
+import com.streamlined.restapp.service.PersonService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/country")
-public class CountryController {
+@RequestMapping("/api/person")
+public class PersonController {
 
-	private final CountryService countryService;
+	private final PersonService personService;
 
 	@GetMapping
-	public Stream<CountryDto> getAllCountries() {
-		return countryService.getAllCountries();
+	public Stream<PersonDto> getAllPersons() {
+		return personService.getAllPersons();
 	}
 
 	@GetMapping("/{id}")
-	public CountryDto getCountryById(@PathVariable Long id) {
-		return countryService.getCountryById(id)
-				.orElseThrow(() -> new EntityNotFoundException("Country with id %d not found".formatted(id)));
+	public PersonDto getPersonById(@PathVariable Long id) {
+		return personService.getPersonById(id)
+				.orElseThrow(() -> new EntityNotFoundException("Person with id %d not found".formatted(id)));
 	}
 
 	@PostMapping
-	public ResponseEntity<Void> addCountry(@RequestBody CountryDto country, HttpServletRequest servletRequest) {
-		countryService.save(country);
-		return ResponseEntity.created(Utilities.getResourceURI(servletRequest, country.id())).build();
+	public ResponseEntity<Void> addPerson(@RequestBody PersonDto person, HttpServletRequest servletRequest) {
+		personService.save(person);
+		return ResponseEntity.created(Utilities.getResourceURI(servletRequest, person.id())).build();
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Void> updateCountry(@PathVariable Long id, @RequestBody CountryDto country) {
-		countryService.save(country);
+	public ResponseEntity<Void> updatePerson(@PathVariable Long id, @RequestBody PersonDto person) {
+		personService.save(person);
 		return ResponseEntity.ok().build();
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteCountry(@PathVariable Long id) {
-		countryService.removeById(id);
+	public ResponseEntity<Void> deletePerson(@PathVariable Long id) {
+		personService.removeById(id);
 		return ResponseEntity.ok().build();
 	}
 
