@@ -2,10 +2,13 @@ package com.streamlined.restapp.dao;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
+import com.streamlined.restapp.exception.EntityNotFoundException;
+import com.streamlined.restapp.exception.IncorrectDataException;
 import com.streamlined.restapp.model.Continent;
 import com.streamlined.restapp.model.Country;
 
@@ -37,12 +40,24 @@ public class CountryRepository {
 	}
 
 	public Country save(Long id, Country country) {
+		if (isDuplicateCountryName(id, country)) {
+			throw new IncorrectDataException("Country list already contains name: %s".formatted(country.getName()));
+		}
 		country.setId(id);
 		countries.put(id, country);
 		return country;
 	}
 
+	private boolean isDuplicateCountryName(Long id, Country country) {
+		return !countries.values().stream()
+				.filter(c -> !Objects.equals(c.getId(), id) && Objects.equals(c.getName(), country.getName())).findAny()
+				.isEmpty();
+	}
+
 	public void deleteById(Long id) {
+		if (findById(id).isEmpty()) {
+			throw new EntityNotFoundException("Country with id %d not found".formatted(id));
+		}
 		countries.remove(id);
 	}
 

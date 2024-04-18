@@ -10,6 +10,7 @@ import com.streamlined.restapp.dao.CountryRepository;
 import com.streamlined.restapp.model.CountryDto;
 import com.streamlined.restapp.model.CountryMapper;
 
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -18,6 +19,7 @@ public class DefaultCountryService implements CountryService {
 
 	private final CountryRepository countryRepository;
 	private final CountryMapper countryMapper;
+	private final Validator validator;
 
 	@Override
 	public Stream<CountryDto> getAllCountries() {
@@ -36,7 +38,9 @@ public class DefaultCountryService implements CountryService {
 
 	@Override
 	public CountryDto save(Long id, CountryDto country) {
-		return countryMapper.toDto(countryRepository.save(id, countryMapper.toEntity(country)));
+		var entity = countryMapper.toEntity(country);
+		Utilities.checkIfValid(validator, entity);
+		return countryMapper.toDto(countryRepository.save(id, entity));
 	}
 
 	@Override
