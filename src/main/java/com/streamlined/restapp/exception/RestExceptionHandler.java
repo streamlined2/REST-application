@@ -4,6 +4,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+
 @RestControllerAdvice
 public class RestExceptionHandler {
 
@@ -14,6 +16,16 @@ public class RestExceptionHandler {
 
 	@ExceptionHandler(IncorrectDataException.class)
 	public ResponseEntity<String> handleIncorrectDataException(IncorrectDataException exception) {
+		return ResponseEntity.badRequest().body(exception.getMessage());
+	}
+
+	@ExceptionHandler(InvalidFormatException.class)
+	public ResponseEntity<String> handleInvalidJsonFormatException(InvalidFormatException exception) {
+		return ResponseEntity.badRequest().body(exception.getMessage());
+	}
+
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<String> handleAnyOtherExceptionByDefault(Exception exception) {
 		return ResponseEntity.badRequest().body(exception.getMessage());
 	}
 

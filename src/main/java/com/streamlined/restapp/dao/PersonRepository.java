@@ -75,7 +75,7 @@ public class PersonRepository {
 						.height(BigDecimal.valueOf(156)).countryOfOrigin(countryRepository.findById(2L).orElseThrow())
 						.citizenship(countryRepository.findById(2L).orElseThrow()).favoriteMeals("grape,pear,banana")
 						.build()),
-				Map.entry(11L, Person.builder().id(12L).name("Amos Webb").birthday(LocalDate.of(1996, 8, 5))
+				Map.entry(11L, Person.builder().id(11L).name("Amos Webb").birthday(LocalDate.of(1996, 8, 5))
 						.sex(Sex.MALE).eyeColor(Color.RED).hairColor(Color.BLUE).weight(BigDecimal.valueOf(96))
 						.height(BigDecimal.valueOf(180)).countryOfOrigin(countryRepository.findById(3L).orElseThrow())
 						.citizenship(countryRepository.findById(3L).orElseThrow())
