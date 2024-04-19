@@ -1,5 +1,6 @@
 package com.streamlined.restapp.service;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.streamlined.restapp.Utilities;
 import com.streamlined.restapp.dao.PersonRepository;
 import com.streamlined.restapp.model.PersonDto;
+import com.streamlined.restapp.model.PersonListDto;
 import com.streamlined.restapp.model.PersonMapper;
 
 import jakarta.validation.Validator;
@@ -46,6 +48,13 @@ public class DefaultPersonService implements PersonService {
 	@Override
 	public void removeById(Long id) {
 		personRepository.deleteById(id);
+	}
+
+	@Override
+	public PersonListDto getPersonList(int pageNumber, int pageSize, Map<String, Object> filterParameters) {
+		var personList = personRepository.getPersonList(pageNumber, pageSize, filterParameters)
+				.map(personMapper::toListDto).toList();
+		return new PersonListDto(personList, personRepository.getTotalPages(pageSize, filterParameters));
 	}
 
 }

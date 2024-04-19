@@ -24,6 +24,11 @@ public class RestExceptionHandler {
 		return ResponseEntity.badRequest().body(exception.getMessage());
 	}
 
+	@ExceptionHandler(IntrospectionException.class)
+	public ResponseEntity<String> handleIntrospectionException(IntrospectionException exception) {
+		return ResponseEntity.badRequest().body(exception.getMessage());
+	}
+
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> handleAnyOtherExceptionByDefault(Exception exception) {
 		return ResponseEntity.badRequest().body(exception.getMessage());

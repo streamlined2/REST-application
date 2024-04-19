@@ -19,6 +19,11 @@ public class PersonMapper {
 				.build();
 	}
 
+	public EssentialPersonDto toListDto(Person person) {
+		return EssentialPersonDto.builder().id(person.getId()).name(person.getName()).birthday(person.getBirthday())
+				.sex(person.getSex()).eyeColor(person.getEyeColor()).height(person.getHeight()).build();
+	}
+
 	public Person toEntity(PersonDto person) {
 		return Person.builder().id(person.id()).name(person.name()).birthday(person.birthday()).sex(person.sex())
 				.eyeColor(person.eyeColor()).hairColor(person.hairColor()).weight(person.weight())

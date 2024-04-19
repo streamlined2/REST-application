@@ -4,11 +4,14 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.springframework.stereotype.Repository;
 
+import com.streamlined.restapp.Utilities;
 import com.streamlined.restapp.exception.EntityNotFoundException;
 import com.streamlined.restapp.exception.IncorrectDataException;
 import com.streamlined.restapp.model.Color;
@@ -18,11 +21,9 @@ import com.streamlined.restapp.model.Sex;
 @Repository
 public class PersonRepository {
 
-	private final CountryRepository countryRepository;
 	private final Map<Long, Person> persons;
 
 	public PersonRepository(CountryRepository countryRepository) {
-		this.countryRepository = countryRepository;
 		persons = new HashMap<>();
 		persons.putAll(Map.ofEntries(
 				Map.entry(1L, Person.builder().id(1L).name("Charley Thomas").birthday(LocalDate.of(1970, 12, 10))
@@ -112,6 +113,45 @@ public class PersonRepository {
 			throw new EntityNotFoundException("Person with id %d not found".formatted(id));
 		}
 		persons.remove(id);
+	}
+
+	public Stream<Person> getPersonList(int pageNumber, int pageSize, Map<String, Object> filterParameters) {
+		final int firstPersonIndex = (pageNumber - 1) * pageSize;
+		return getFilteredPersonStream(filterParameters).skip(firstPersonIndex).limit(pageSize);
+	}
+
+	private Stream<Person> getFilteredPersonStream(Map<String, Object> filterParameters) {
+		return persons.values().stream().filter(person -> isFilterCriteriaValid(person, filterParameters));
+	}
+
+	public int getTotalPages(int pageSize, Map<String, Object> filterParameters) {
+		final long totalSize = getFilteredPersonStream(filterParameters).count();
+		return (int) (totalSize / pageSize + (totalSize % pageSize > 0 ? 1 : 0));
+	}
+
+	private boolean isFilterCriteriaValid(Person person, Map<String, Object> filterParameters) {
+		for (var filterEntry : filterParameters.entrySet()) {
+			if (!isFilterCriteriaValid(person, filterEntry)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean isFilterCriteriaValid(Person person, Entry<String, Object> filterCriteriaEntry) {
+		var propertyValue = Utilities.getPropertyValue(Person.class, person, filterCriteriaEntry.getKey());
+		var keyValue = filterCriteriaEntry.getValue();
+		return isEqual(propertyValue, keyValue);
+	}
+
+	private boolean isEqual(Object propertyValue, Object keyValue) {
+		if (Number.class.isAssignableFrom(propertyValue.getClass())
+				&& Number.class.isAssignableFrom(keyValue.getClass())) {
+			double propertyDouble = ((Number) propertyValue).doubleValue();
+			double keyDouble = ((Number) keyValue).doubleValue();
+			return Math.abs(propertyDouble - keyDouble) < 0.001;
+		}
+		return Objects.equals(String.valueOf(propertyValue), String.valueOf(keyValue));
 	}
 
 }
