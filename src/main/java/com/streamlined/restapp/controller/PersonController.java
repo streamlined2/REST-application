@@ -4,7 +4,9 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -64,8 +66,10 @@ public class PersonController {
 				ControllerUtilities.getPageSize(parameters), ControllerUtilities.getFilterParameters(parameters));
 	}
 
-	@PostMapping(value = "/_report")
-	public ResponseEntity<FileSystemResource> getPersonListAsFile(@RequestBody Map<String, Object> parameters) {
+	@PostMapping(value = "/_report", consumes = { MediaType.APPLICATION_FORM_URLENCODED_VALUE,
+			MediaType.APPLICATION_JSON_VALUE })
+	public ResponseEntity<FileSystemResource> getPersonListAsFile(HttpEntity<Map<String, Object>> entity) {
+		var parameters = entity.getBody();
 		var outputFile = personService
 				.getFilteredPersonsAsFileResource(ControllerUtilities.getFilterParameters(parameters));
 		HttpHeaders responseHeaders = new HttpHeaders();

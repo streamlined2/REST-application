@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.time.format.DateTimeFormatter;
 import java.util.stream.Stream;
 
 import org.springframework.context.annotation.Primary;
@@ -22,6 +23,7 @@ public class CSVReporter implements Reporter {
 	private static final String RESULT_FILE_NAME = "workbook.csv";
 	private static final String WORKBOOK_FILE_PREFIX = "workbook_";
 	private static final String WORKBOOK_FILE_SUFFIX = ".csv";
+	private static final String FIELD_SEPARATOR = ";";
 
 	@Override
 	public FileSystemResource getFileResource(Stream<Person> personStream) {
@@ -37,10 +39,17 @@ public class CSVReporter implements Reporter {
 	private void fillInWorkbookFile(Path file, Stream<Person> personStream) throws IOException {
 		try (var writer = Files.newBufferedWriter(file, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING,
 				StandardOpenOption.CREATE)) {
+			StringBuilder builder = new StringBuilder();
 			for (var i = personStream.iterator(); i.hasNext();) {
 				Person person = i.next();
-				writer.write("%s,%tF,%s,%s,%.2f%n".formatted(person.getName(), person.getBirthday(),
-						person.getSex().toString(), person.getEyeColor().toString(), person.getHeight().doubleValue()));
+				builder.setLength(0);
+				builder.append(person.getName()).append(FIELD_SEPARATOR);
+				builder.append(person.getBirthday().format(DateTimeFormatter.ISO_DATE)).append(FIELD_SEPARATOR);
+				builder.append(person.getSex().toString()).append(FIELD_SEPARATOR);
+				builder.append(person.getEyeColor().toString()).append(FIELD_SEPARATOR);
+				builder.append(person.getHeight());
+				writer.write(builder.toString());
+				writer.newLine();
 			}
 		}
 	}
