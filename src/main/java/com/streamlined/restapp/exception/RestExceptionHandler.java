@@ -34,6 +34,11 @@ public class RestExceptionHandler {
 		return ResponseEntity.badRequest().body(exception.getMessage());
 	}
 
+	@ExceptionHandler(ParseException.class)
+	public ResponseEntity<String> handleParseException(ParseException exception) {
+		return ResponseEntity.badRequest().body(exception.getMessage());
+	}
+
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> handleAnyOtherExceptionByDefault(Exception exception) {
 		return ResponseEntity.badRequest().body(exception.getMessage());

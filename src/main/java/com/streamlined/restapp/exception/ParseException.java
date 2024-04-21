@@ -7,5 +7,5 @@ import lombok.experimental.StandardException;
 
 @StandardException
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class IncorrectDataException extends RuntimeException {
+public class ParseException extends RuntimeException {
 }

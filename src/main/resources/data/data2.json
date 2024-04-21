@@ -1,0 +1,74 @@
+[
+	{
+		"name": "Sandy Fisher",
+		"birthday": "1986-12-01",
+		"sex": "FEMALE",
+		"eyeColor": "BLUE",
+		"hairColor": "GRAY",
+		"weight": 75.00,
+		"height": 175.00,
+		"countryOfOrigin": {
+			"name": "Canada",
+			"continent": "NORTH_AMERICA",
+			"capital": "Ottawa",
+			"population": 125000000,
+			"square": 6345813.01
+		},
+		"citizenship": {
+			"name": "USA",
+			"continent": "NORTH_AMERICA",
+			"capital": "Washington",
+			"population": 250000000,
+			"square": 6361952.20
+		},
+		"favoriteMeals":"pasta,apple,pear"
+	},
+	{
+		"name": "Ken Winston",
+		"birthday": "2000-04-10",
+		"sex": "MALE",
+		"eyeColor": "RED",
+		"hairColor": "GREEN",
+		"weight": 80.50,
+		"height": 205.00,
+		"countryOfOrigin": {
+			"name": "Netherlands",
+			"continent": "EUROPE",
+			"capital": "Amsterdam",
+			"population": 35000000,
+			"square": 425853.01
+		},
+		"citizenship": {
+			"name": "USA",
+			"continent": "NORTH_AMERICA",
+			"capital": "Washington",
+			"population": 250000000,
+			"square": 6361952.20
+		},
+		"favoriteMeals":"apple,pear,grape"
+	},
+	{
+		"name": "Sunny Smile",
+		"birthday": "2010-03-05",
+		"sex": "FEMALE",
+		"eyeColor": "BROWN",
+		"hairColor": "YELLOW",
+		"weight": 50.20,
+		"height": 130.00,
+		"countryOfOrigin": {
+			"name": "USA",
+			"continent": "NORTH_AMERICA",
+			"capital": "Washington",
+			"population": 250000000,
+			"square": 6361952.20
+		},
+		"citizenship": {
+			"name": "USA",
+			"continent": "NORTH_AMERICA",
+			"capital": "Washington",
+			"population": 250000000,
+			"square": 6361952.20
+		},
+		"favoriteMeals":"pear,grape,meat"
+	}
+]
