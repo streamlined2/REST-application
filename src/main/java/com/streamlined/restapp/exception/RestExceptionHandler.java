@@ -29,6 +29,11 @@ public class RestExceptionHandler {
 		return ResponseEntity.badRequest().body(exception.getMessage());
 	}
 
+	@ExceptionHandler(ReportException.class)
+	public ResponseEntity<String> handleReportException(ReportException exception) {
+		return ResponseEntity.badRequest().body(exception.getMessage());
+	}
+
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> handleAnyOtherExceptionByDefault(Exception exception) {
 		return ResponseEntity.badRequest().body(exception.getMessage());

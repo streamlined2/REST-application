@@ -1,10 +1,10 @@
 package com.streamlined.restapp.controller;
 
-import java.util.Arrays;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.streamlined.restapp.Utilities;
 import com.streamlined.restapp.exception.EntityNotFoundException;
 import com.streamlined.restapp.model.PersonDto;
 import com.streamlined.restapp.model.PersonListDto;
@@ -27,11 +26,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/person")
 public class PersonController {
-
-	private static final String PAGE_PARAMETER = "page";
-	private static final int DEFAULT_PAGE_NUMBER = 1;
-	private static final String SIZE_PARAMETER = "size";
-	private static final int DEFAULT_SIZE_VALUE = 5;
 
 	private final PersonService personService;
 
@@ -49,7 +43,7 @@ public class PersonController {
 	@PostMapping
 	public ResponseEntity<Void> addPerson(@RequestBody PersonDto person, HttpServletRequest servletRequest) {
 		personService.save(person);
-		return ResponseEntity.created(Utilities.getResourceURI(servletRequest, person.id())).build();
+		return ResponseEntity.created(ControllerUtilities.getResourceURI(servletRequest, person.id())).build();
 	}
 
 	@PutMapping("/{id}")
@@ -66,55 +60,19 @@ public class PersonController {
 
 	@PostMapping("/_list")
 	public PersonListDto getPersonList(@RequestBody Map<String, Object> parameters) {
-		return personService.getPersonList(getPageNumber(parameters), getPageSize(parameters),
-				getFilterParameters(parameters));
+		return personService.getPersonList(ControllerUtilities.getPageNumber(parameters),
+				ControllerUtilities.getPageSize(parameters), ControllerUtilities.getFilterParameters(parameters));
 	}
 
-	private int getPageNumber(Map<String, Object> parameters) {
-		var pageNumber = parameters.get(PAGE_PARAMETER);
-		if (pageNumber == null) {
-			return DEFAULT_PAGE_NUMBER;
-		}
-		try {
-			if (pageNumber instanceof Integer i) {
-				return i.intValue();
-			} else if (pageNumber instanceof String s) {
-				return Integer.parseInt(s);
-			}
-			return DEFAULT_PAGE_NUMBER;
-		} catch (NumberFormatException e) {
-			return DEFAULT_PAGE_NUMBER;
-		}
-	}
-
-	private int getPageSize(Map<String, Object> parameters) {
-		var pageSize = parameters.get(SIZE_PARAMETER);
-		if (pageSize == null) {
-			return DEFAULT_SIZE_VALUE;
-		}
-		try {
-			if (pageSize instanceof Integer i) {
-				return i.intValue();
-			} else if (pageSize instanceof String s) {
-				return Integer.parseInt(s);
-			}
-			return DEFAULT_SIZE_VALUE;
-		} catch (NumberFormatException e) {
-			return DEFAULT_SIZE_VALUE;
-		}
-	}
-
-	private Map<String, Object> getFilterParameters(Map<String, Object> parameters) {
-		return parameters.entrySet().stream().filter(this::isNotReservedParameter)
-				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-	}
-
-	private boolean isNotReservedParameter(Map.Entry<String, Object> entry) {
-		return isNotReservedParameter(entry.getKey(), PAGE_PARAMETER, SIZE_PARAMETER);
-	}
-
-	private boolean isNotReservedParameter(Object obj, Object... values) {
-		return !Arrays.asList(values).contains(obj);
+	@PostMapping(value = "/_report")
+	public ResponseEntity<FileSystemResource> getPersonListAsFile(@RequestBody Map<String, Object> parameters) {
+		var outputFile = personService
+				.getFilteredPersonsAsFileResource(ControllerUtilities.getFilterParameters(parameters));
+		HttpHeaders responseHeaders = new HttpHeaders();
+		responseHeaders.set(HttpHeaders.CONTENT_DISPOSITION,
+				"attachment; filename=\"%s\"".formatted(outputFile.fileName()));
+		return ResponseEntity.ok().contentType(outputFile.mediaType()).headers(responseHeaders)
+				.body(outputFile.fileResource());
 	}
 
 }

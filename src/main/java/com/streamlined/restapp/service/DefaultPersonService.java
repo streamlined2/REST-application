@@ -8,9 +8,12 @@ import org.springframework.stereotype.Service;
 
 import com.streamlined.restapp.Utilities;
 import com.streamlined.restapp.dao.PersonRepository;
+import com.streamlined.restapp.model.EssentialPersonDto;
 import com.streamlined.restapp.model.PersonDto;
 import com.streamlined.restapp.model.PersonListDto;
 import com.streamlined.restapp.model.PersonMapper;
+import com.streamlined.restapp.model.ReportDto;
+import com.streamlined.restapp.reporter.Reporter;
 
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +25,7 @@ public class DefaultPersonService implements PersonService {
 	private final PersonRepository personRepository;
 	private final PersonMapper personMapper;
 	private final Validator validator;
+	private final Reporter reporter;
 
 	@Override
 	public Stream<PersonDto> getAllPersons() {
@@ -41,7 +45,7 @@ public class DefaultPersonService implements PersonService {
 	@Override
 	public PersonDto save(Long id, PersonDto person) {
 		var entity = personMapper.toEntity(person);
-		Utilities.checkIfValid(validator, entity, "person");
+		ServiceUtilities.checkIfValid(validator, entity, "person");
 		return personMapper.toDto(personRepository.save(id, entity));
 	}
 
@@ -54,7 +58,19 @@ public class DefaultPersonService implements PersonService {
 	public PersonListDto getPersonList(int pageNumber, int pageSize, Map<String, Object> filterParameters) {
 		var personList = personRepository.getPersonList(pageNumber, pageSize, filterParameters)
 				.map(personMapper::toListDto).toList();
-		return new PersonListDto(personList, personRepository.getTotalPages(pageSize, filterParameters));
+		int totalPages = personRepository.getTotalPages(pageSize, filterParameters);
+		return new PersonListDto(personList, totalPages);
+	}
+
+	@Override
+	public Stream<EssentialPersonDto> getFilteredPersonStream(Map<String, Object> filterParameters) {
+		return personRepository.getFilteredPersonStream(filterParameters).map(personMapper::toListDto);
+	}
+
+	@Override
+	public ReportDto getFilteredPersonsAsFileResource(Map<String, Object> filterParameters) {
+		var personStream = personRepository.getFilteredPersonStream(filterParameters);
+		return new ReportDto(reporter.getFileResource(personStream), reporter.getFileName(), reporter.getMediaType());
 	}
 
 }

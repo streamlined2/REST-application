@@ -120,7 +120,7 @@ public class PersonRepository {
 		return getFilteredPersonStream(filterParameters).skip(firstPersonIndex).limit(pageSize);
 	}
 
-	private Stream<Person> getFilteredPersonStream(Map<String, Object> filterParameters) {
+	public Stream<Person> getFilteredPersonStream(Map<String, Object> filterParameters) {
 		return persons.values().stream().filter(person -> isFilterCriteriaValid(person, filterParameters));
 	}
 
