@@ -21,6 +21,7 @@ import com.streamlined.restapp.model.Sex;
 @Repository
 public class PersonRepository {
 
+	private static final double DOUBLE_VALUE_PRECISION = 0.001;
 	private final Map<Long, Person> persons;
 
 	public PersonRepository(CountryRepository countryRepository) {
@@ -101,6 +102,10 @@ public class PersonRepository {
 		return person;
 	}
 
+	public Person save(Person person) {
+		return save(person.getId(), person);
+	}
+
 	private boolean isDuplicatePersonNameAndBirthday(Long id, Person person) {
 		return !persons.values().stream()
 				.filter(c -> !Objects.equals(c.getId(), id) && Objects.equals(c.getName(), person.getName())
@@ -149,7 +154,7 @@ public class PersonRepository {
 				&& Number.class.isAssignableFrom(keyValue.getClass())) {
 			double propertyDouble = ((Number) propertyValue).doubleValue();
 			double keyDouble = ((Number) keyValue).doubleValue();
-			return Math.abs(propertyDouble - keyDouble) < 0.001;
+			return Math.abs(propertyDouble - keyDouble) < DOUBLE_VALUE_PRECISION;
 		}
 		return Objects.equals(String.valueOf(propertyValue), String.valueOf(keyValue));
 	}

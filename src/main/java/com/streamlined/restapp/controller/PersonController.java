@@ -15,7 +15,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.streamlined.restapp.exception.EntityNotFoundException;
 import com.streamlined.restapp.model.PersonDto;
 import com.streamlined.restapp.model.PersonListDto;
@@ -77,6 +80,12 @@ public class PersonController {
 				"attachment; filename=\"%s\"".formatted(outputFile.fileName()));
 		return ResponseEntity.ok().contentType(outputFile.mediaType()).headers(responseHeaders)
 				.body(outputFile.fileResource());
+	}
+
+	@PostMapping(value = "/upload")
+	public ResponseEntity<UploadResponse> uploadFile(@RequestParam("file") MultipartFile multipartFile) {
+		var uploadStatus = personService.uploadFile(multipartFile);
+		return ResponseEntity.ok().body(uploadStatus);
 	}
 
 }

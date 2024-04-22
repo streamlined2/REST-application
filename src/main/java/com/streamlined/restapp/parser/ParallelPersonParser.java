@@ -121,9 +121,4 @@ public class ParallelPersonParser implements PersonParser {
 
 	}
 
-	public static void main(String... args) {
-		var parser = new ParallelPersonParser();
-		parser.stream(Path.of("src", "main", "resources", "data")).forEach(System.out::println);
-	}
-
 }

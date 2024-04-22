@@ -39,6 +39,11 @@ public class RestExceptionHandler {
 		return ResponseEntity.badRequest().body(exception.getMessage());
 	}
 
+	@ExceptionHandler(FileStorageException.class)
+	public ResponseEntity<String> handleFileStorageException(FileStorageException exception) {
+		return ResponseEntity.badRequest().body(exception.getMessage());
+	}
+
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> handleAnyOtherExceptionByDefault(Exception exception) {
 		return ResponseEntity.badRequest().body(exception.getMessage());
