@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: REST-application
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:15432/restapp
+    username: postgres
+    password: secret
+  liquibase:
+    change-log: db/changelog.xml
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8080
+  error:
+    whitelabel:
+      enabled: false
+      include-stacktrace: never
+      include-message: never
+

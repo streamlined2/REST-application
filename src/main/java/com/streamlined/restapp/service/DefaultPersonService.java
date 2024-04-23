@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,6 +14,7 @@ import com.streamlined.restapp.Utilities;
 import com.streamlined.restapp.controller.UploadResponse;
 import com.streamlined.restapp.dao.PersonRepository;
 import com.streamlined.restapp.model.EssentialPersonDto;
+import com.streamlined.restapp.model.Person;
 import com.streamlined.restapp.model.PersonDto;
 import com.streamlined.restapp.model.PersonListDto;
 import com.streamlined.restapp.model.PersonMapper;
@@ -50,8 +53,9 @@ public class DefaultPersonService implements PersonService {
 	@Override
 	public PersonDto save(Long id, PersonDto person) {
 		var entity = personMapper.toEntity(person);
+		entity.setId(id);
 		ServiceUtilities.checkIfValid(validator, entity, "person");
-		return personMapper.toDto(personRepository.save(id, entity));
+		return personMapper.toDto(personRepository.save(entity));
 	}
 
 	@Override
@@ -61,20 +65,33 @@ public class DefaultPersonService implements PersonService {
 
 	@Override
 	public PersonListDto getPersonList(int pageNumber, int pageSize, Map<String, Object> filterParameters) {
-		var personList = personRepository.getPersonList(pageNumber, pageSize, filterParameters)
-				.map(personMapper::toListDto).toList();
-		int totalPages = personRepository.getTotalPages(pageSize, filterParameters);
+		Person probe = Utilities.getProbe(Person.class, filterParameters);
+		Example<Person> example = Example.of(probe);
+		var pageable = PageRequest.of(pageNumber, pageSize);
+		int totalPages = getTotalPages(pageSize, example);
+		var personList = personRepository.findAll(example, pageable).map(personMapper::toListDto).toList();
 		return new PersonListDto(personList, totalPages);
+	}
+
+	private int getTotalPages(int pageSize, Example<Person> example) {
+		final long totalClount = personRepository.count(example);
+		return (int) (totalClount / pageSize + (totalClount % pageSize > 0 ? 1 : 0));
 	}
 
 	@Override
 	public Stream<EssentialPersonDto> getFilteredPersonStream(Map<String, Object> filterParameters) {
-		return personRepository.getFilteredPersonStream(filterParameters).map(personMapper::toListDto);
+		return getFilteredPersonEntityStream(filterParameters).map(personMapper::toListDto);
+	}
+
+	private Stream<Person> getFilteredPersonEntityStream(Map<String, Object> filterParameters) {
+		Person probe = Utilities.getProbe(Person.class, filterParameters);
+		Example<Person> example = Example.of(probe);
+		return personRepository.findAll(example).stream();
 	}
 
 	@Override
 	public ReportDto getFilteredPersonsAsFileResource(Map<String, Object> filterParameters) {
-		var personStream = personRepository.getFilteredPersonStream(filterParameters);
+		var personStream = getFilteredPersonEntityStream(filterParameters);
 		return new ReportDto(reporter.getFileResource(personStream), reporter.getFileName(), reporter.getMediaType());
 	}
 

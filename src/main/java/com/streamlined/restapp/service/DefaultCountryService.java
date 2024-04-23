@@ -39,8 +39,9 @@ public class DefaultCountryService implements CountryService {
 	@Override
 	public CountryDto save(Long id, CountryDto country) {
 		var entity = countryMapper.toEntity(country);
+		entity.setId(id);
 		ServiceUtilities.checkIfValid(validator, entity, "country");
-		return countryMapper.toDto(countryRepository.save(id, entity));
+		return countryMapper.toDto(countryRepository.save(entity));
 	}
 
 	@Override
