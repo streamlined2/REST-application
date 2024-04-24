@@ -24,7 +24,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.streamlined.restapp.exception.ParseException;
 import com.streamlined.restapp.model.Person;
 
-@Component("personParser")
+@Component
 public class ParallelPersonParser implements PersonParser {
 
 	private static final String SOURCE_FILE_PATTERN = "*.json";
@@ -49,13 +49,13 @@ public class ParallelPersonParser implements PersonParser {
 	private class StreamingIterator implements Iterator<Person> {
 
 		private final ExecutorService executorService;
-		private final AtomicInteger finishedThreadCount;
+		private final AtomicInteger workingThreadCount;
 		private final BlockingQueue<Path> sourceFileQueue;
 		private final BlockingQueue<Person> resultQueue;
 
 		private StreamingIterator(Path path) {
 			executorService = Executors.newCachedThreadPool();
-			finishedThreadCount = new AtomicInteger(THREAD_COUNT);
+			workingThreadCount = new AtomicInteger(THREAD_COUNT);
 			sourceFileQueue = new ArrayBlockingQueue<>(SOURCE_FILE_QUEUE_INITIAL_CAPACITY);
 			resultQueue = new ArrayBlockingQueue<>(RESULT_QUEUE_INITIAL_CAPACITY);
 
@@ -84,7 +84,7 @@ public class ParallelPersonParser implements PersonParser {
 					parseFile(filePath);
 				}
 			} finally {
-				finishedThreadCount.decrementAndGet();
+				workingThreadCount.decrementAndGet();
 			}
 		}
 
@@ -95,12 +95,12 @@ public class ParallelPersonParser implements PersonParser {
 					resultQueue.put(entity);
 				}
 			} catch (IOException | InterruptedException e) {
-				throw new ParseException("Error parsing file %s".formatted(filePath.toAbsolutePath()), e);
+				throw new ParseException("Error parsing file %s".formatted(filePath.getFileName()), e);
 			}
 		}
 
 		private boolean isDone() {
-			return finishedThreadCount.intValue() == 0 && resultQueue.isEmpty();
+			return workingThreadCount.intValue() == 0 && resultQueue.isEmpty();
 		}
 
 		@Override
