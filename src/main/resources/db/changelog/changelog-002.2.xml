@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd
+						http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd">
+	<changeSet author="streamlined"
+		id="002.2 add check constraints for person table">
+		<sql>
+			alter table person add constraint check_name check
+			(length(trim(name))>=3);
+		</sql>
+		<sql>
+			alter table person add constraint check_birthday check
+			(current_date > birthday);
+		</sql>
+		<sql>
+			alter table person add constraint check_sex check
+			(sex in ('MALE','FEMALE'));
+		</sql>
+		<sql>
+			alter table person add constraint check_weight check
+			(weight >= 50 and 150 >= weight);
+		</sql>
+		<sql>
+			alter table person add constraint check_height check
+			(height >= 60 and 220 >= height);
+		</sql>
+		<sql>
+			alter table person add constraint check_meals check
+			(regexp_like(meals,'\w{3,}(,\w{3,})*'));
+		</sql>
+	</changeSet>
+</databaseChangeLog>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd
+						http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd">
+	<changeSet author="streamlined" id="002.1 create index for person table">
+		<createIndex tableName="person" indexName="person_name_birthday">
+			<column name="name" />
+			<column name="birthday" />
+		</createIndex>
+		<createIndex tableName="person"
+			indexName="person_sex_citizenship_origin">
+			<column name="sex" />
+			<column name="citizenship" />
+			<column name="origin" />
+		</createIndex>
+	</changeSet>
+</databaseChangeLog>
