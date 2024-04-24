@@ -38,8 +38,8 @@ public class CountryController {
 
 	@PostMapping
 	public ResponseEntity<Void> addCountry(@RequestBody CountryDto country, HttpServletRequest servletRequest) {
-		countryService.save(country);
-		return ResponseEntity.created(ControllerUtilities.getResourceURI(servletRequest, country.id())).build();
+		var savedCountry = countryService.save(country);
+		return ResponseEntity.created(ControllerUtilities.getResourceURI(servletRequest, savedCountry.id())).build();
 	}
 
 	@PutMapping("/{id}")

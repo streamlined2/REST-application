@@ -47,8 +47,8 @@ public class PersonController {
 
 	@PostMapping
 	public ResponseEntity<Void> addPerson(@RequestBody PersonDto person, HttpServletRequest servletRequest) {
-		personService.save(person);
-		return ResponseEntity.created(ControllerUtilities.getResourceURI(servletRequest, person.id())).build();
+		var savedPerson = personService.save(person);
+		return ResponseEntity.created(ControllerUtilities.getResourceURI(servletRequest, savedPerson.id())).build();
 	}
 
 	@PutMapping("/{id}")
