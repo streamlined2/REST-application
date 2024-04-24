@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd
+						http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd">
+	<changeSet author="streamlined"
+		id="001.2 fill up country table">
+		<insert tableName="country">
+			<column name="name" value="USA" />
+			<column name="continent" value="NORTH_AMERICA" />
+			<column name="capital" value="Washington" />
+			<column name="population" value="334914895" />
+			<column name="square" value="8080470" />
+		</insert>
+		<insert tableName="country">
+			<column name="name" value="United Kingdom" />
+			<column name="continent" value="EUROPE" />
+			<column name="capital" value="London" />
+			<column name="population" value="67596281" />
+			<column name="square" value="244376" />
+		</insert>
+		<insert tableName="country">
+			<column name="name" value="Canada" />
+			<column name="continent" value="NORTH_AMERICA" />
+			<column name="capital" value="Ottawa" />
+			<column name="population" value="40769890" />
+			<column name="square" value="9984670" />
+		</insert>
+		<insert tableName="country">
+			<column name="name" value="Netherlands" />
+			<column name="continent" value="EUROPE" />
+			<column name="capital" value="Amsterdam" />
+			<column name="population" value="18072300" />
+			<column name="square" value="42531" />
+		</insert>
+		<insert tableName="country">
+			<column name="name" value="Germany" />
+			<column name="continent" value="EUROPE" />
+			<column name="capital" value="Berlin" />
+			<column name="population" value="84607016" />
+			<column name="square" value="357600" />
+		</insert>
+		<insert tableName="country">
+			<column name="name" value="France" />
+			<column name="continent" value="EUROPE" />
+			<column name="capital" value="Paris" />
+			<column name="population" value="68373433" />
+			<column name="square" value="643801" />
+		</insert>
+		<insert tableName="country">
+			<column name="name" value="Spain" />
+			<column name="continent" value="EUROPE" />
+			<column name="capital" value="Madrid" />
+			<column name="population" value="48592909" />
+			<column name="square" value="505994" />
+		</insert>
+		<insert tableName="country">
+			<column name="name" value="Portugal" />
+			<column name="continent" value="EUROPE" />
+			<column name="capital" value="Lisbon" />
+			<column name="population" value="10467366" />
+			<column name="square" value="92230" />
+		</insert>
+		<insert tableName="country">
+			<column name="name" value="Belgium" />
+			<column name="continent" value="EUROPE" />
+			<column name="capital" value="Brussels" />
+			<column name="population" value="11697557" />
+			<column name="square" value="30689" />
+		</insert>
+		<insert tableName="country">
+			<column name="name" value="Poland" />
+			<column name="continent" value="EUROPE" />
+			<column name="capital" value="Warsaw" />
+			<column name="population" value="38036118" />
+			<column name="square" value="312696" />
+		</insert>
+		<insert tableName="country">
+			<column name="name" value="Romania" />
+			<column name="continent" value="EUROPE" />
+			<column name="capital" value="Bucharest" />
+			<column name="population" value="19051562" />
+			<column name="square" value="238398" />
+		</insert>
+		<insert tableName="country">
+			<column name="name" value="Bulgaria" />
+			<column name="continent" value="EUROPE" />
+			<column name="capital" value="Sofia" />
+			<column name="population" value="6447710" />
+			<column name="square" value="110994" />
+		</insert>
+		<insert tableName="country">
+			<column name="name" value="Czech Republic" />
+			<column name="continent" value="EUROPE" />
+			<column name="capital" value="Prague" />
+			<column name="population" value="10900555" />
+			<column name="square" value="78871" />
+		</insert>
+		<insert tableName="country">
+			<column name="name" value="Slovakia" />
+			<column name="continent" value="EUROPE" />
+			<column name="capital" value="Bratislava" />
+			<column name="population" value="5460185" />
+			<column name="square" value="49035" />
+		</insert>
+		<insert tableName="country">
+			<column name="name" value="Hungary" />
+			<column name="continent" value="EUROPE" />
+			<column name="capital" value="Budapest" />
+			<column name="population" value="9597085" />
+			<column name="square" value="93030" />
+		</insert>
+		<insert tableName="country">
+			<column name="name" value="Greece" />
+			<column name="continent" value="EUROPE" />
+			<column name="capital" value="Athens" />
+			<column name="population" value="10413982" />
+			<column name="square" value="131957" />
+		</insert>
+		<insert tableName="country">
+			<column name="name" value="Italy" />
+			<column name="continent" value="EUROPE" />
+			<column name="capital" value="Rome" />
+			<column name="population" value="58853482" />
+			<column name="square" value="301340" />
+		</insert>
+		<insert tableName="country">
+			<column name="name" value="Ukraine" />
+			<column name="continent" value="EUROPE" />
+			<column name="capital" value="Kyiv" />
+			<column name="population" value="33365000" />
+			<column name="square" value="603628" />
+		</insert>
+	</changeSet>
+</databaseChangeLog>
