@@ -1,11 +1,11 @@
 package com.streamlined.restapp.service;
 
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -64,34 +64,31 @@ public class DefaultPersonService implements PersonService {
 	}
 
 	@Override
-	public PersonListDto getPersonList(int pageNumber, int pageSize, Map<String, Object> filterParameters) {
-		Person probe = Utilities.getProbe(Person.class, filterParameters);
-		Example<Person> example = Example.of(probe);
-		var pageable = PageRequest.of(pageNumber, pageSize);
-		int totalPages = getTotalPages(pageSize, example);
-		var personList = personRepository.findAll(example, pageable).map(personMapper::toListDto).toList();
-		return new PersonListDto(personList, totalPages);
-	}
-
-	private int getTotalPages(int pageSize, Example<Person> example) {
-		final long totalClount = personRepository.count(example);
-		return (int) (totalClount / pageSize + (totalClount % pageSize > 0 ? 1 : 0));
+	public void removeAllPersons() {
+		personRepository.deleteAll();
 	}
 
 	@Override
-	public Stream<EssentialPersonDto> getFilteredPersonStream(Map<String, Object> filterParameters) {
-		return getFilteredPersonEntityStream(filterParameters).map(personMapper::toListDto);
+	public PersonListDto getPersonList(int pageNumber, int pageSize, Person personProbe) {
+		Example<Person> example = Example.of(personProbe);
+		var pageable = PageRequest.of(pageNumber, pageSize);
+		Page<Person> personList = personRepository.findAll(example, pageable);
+		return new PersonListDto(personList.map(personMapper::toListDto).toList(), personList.getTotalPages());
 	}
 
-	private Stream<Person> getFilteredPersonEntityStream(Map<String, Object> filterParameters) {
-		Person probe = Utilities.getProbe(Person.class, filterParameters);
-		Example<Person> example = Example.of(probe);
+	@Override
+	public Stream<EssentialPersonDto> getFilteredPersonStream(Person personProbe) {
+		return getFilteredPersonEntityStream(personProbe).map(personMapper::toListDto);
+	}
+
+	private Stream<Person> getFilteredPersonEntityStream(Person personProbe) {
+		Example<Person> example = Example.of(personProbe);
 		return personRepository.findAll(example).stream();
 	}
 
 	@Override
-	public ReportDto getFilteredPersonsAsFileResource(Map<String, Object> filterParameters) {
-		var personStream = getFilteredPersonEntityStream(filterParameters);
+	public ReportDto getFilteredPersonsAsFileResource(Person personProbe) {
+		var personStream = getFilteredPersonEntityStream(personProbe);
 		return new ReportDto(reporter.getFileResource(personStream), reporter.getFileName(), reporter.getMediaType());
 	}
 

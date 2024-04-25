@@ -29,13 +29,13 @@ public class PersonDataGenerator {
 	private static final int PERSON_COUNT = 1_000;
 	private static final int FILE_COUNT = 1;
 
-	private static final double MIN_WEIGHT = 30;
-	private static final double MAX_WEIGHT = 180;
-	private static final double MIN_HEIGHT = 40;
-	private static final double MAX_HEIGHT = 250;
+	private static final double MIN_WEIGHT = 45;
+	private static final double MAX_WEIGHT = 155;
+	private static final double MIN_HEIGHT = 55;
+	private static final double MAX_HEIGHT = 225;
 	private static final int MIN_MEALS_COUNT = 3;
-	private static final LocalDate BIRTHDAY_START = LocalDate.of(1970, 1, 1);
-	private static final long BIRTHDAY_RANGE = 70 * ChronoUnit.YEARS.getDuration().toDays();
+	private static final LocalDate BIRTHDAY_START = LocalDate.of(1980, 1, 1);
+	private static final long BIRTHDAY_RANGE = 45 * ChronoUnit.YEARS.getDuration().toDays();
 
 	private final List<Country> countries = List.of(
 			Country.builder().id(1L).name("USA").continent(Continent.NORTH_AMERICA).capital("Washington")
@@ -83,12 +83,13 @@ public class PersonDataGenerator {
 
 	private final List<String> meals = List.of("apple", "pear", "grape", "banana", "watermelon");
 
-	private final List<String> names = List.of("Charley Thomas", "Jess Newton", "Tom Kent", "Hiram Horton",
-			"Jess Burgess", "Perry Gleason", "Nathan Hahn", "Claude Sorensen", "Oliver Elliott", "Eli Summers",
-			"Amos Webb", "Cecil Cash", "Guy Nielsen", "Milton Jensen", "Vernon Brady", "Alexander Adams",
-			"Clarence Griffith", "Howard Nichols", "Jasper Steiner", "Walter Denton", "Mack Kent", "Hubert Jennings",
-			"Alfred Emery", "Martin Ellis", "Oliver Ackerman", "Joseph Crowley", "Wallace Justice", "Eugene Helton",
-			"Hugh Waller", "Earl Wallace");
+	private final List<String> firstNames = List.of("Charley", "Jess", "Tom", "Hiram", "Perry", "Nathan", "Claude",
+			"Oliver", "Eli", "Amos", "Cecil", "Guy", "Milton", "Vernon", "Alexander", "Clarence", "Howard", "Jasper",
+			"Walter", "Mack", "Hubert", "Alfred", "Martin", "Oliver", "Joseph", "Wallace", "Eugene", "Hugh", "Earl");
+	private final List<String> lastNames = List.of("Thomas", "Newton", "Kent", "Horton", "Burgess", "Gleason", "Hahn",
+			"Sorensen", "Elliott", "Summers", "Webb", "Cash", "Nielsen", "Jensen", "Brady", "Adams", "Griffith",
+			"Nichols", "Steiner", "Denton", "Jennings", "Emery", "Ellis", "Ackerman", "Crowley", "Justice", "Helton",
+			"Waller", "Wallace");
 
 	private final ObjectMapper mapper;
 	private final Random random;
@@ -162,7 +163,8 @@ public class PersonDataGenerator {
 	}
 
 	private String getName() {
-		return names.get(random.nextInt(names.size()));
+		return firstNames.get(random.nextInt(firstNames.size())) + " "
+				+ lastNames.get(random.nextInt(lastNames.size()));
 	}
 
 	private LocalDate getBirthday() {
@@ -185,9 +187,9 @@ public class PersonDataGenerator {
 		}
 		return b.toString();
 	}
-/*
+
 	public static void main(String... args) {
 		new PersonDataGenerator().createData(RESULT_FILE_DIRECTORY, PERSON_COUNT, FILE_COUNT);
 	}
-*/
+
 }

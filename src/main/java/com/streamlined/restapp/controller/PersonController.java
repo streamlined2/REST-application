@@ -1,10 +1,8 @@
 package com.streamlined.restapp.controller;
 
-import java.util.Map;
 import java.util.stream.Stream;
 
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -63,18 +61,22 @@ public class PersonController {
 		return ResponseEntity.ok().build();
 	}
 
+	@DeleteMapping
+	public ResponseEntity<Void> deleteAll() {
+		personService.removeAllPersons();
+		return ResponseEntity.ok().build();
+	}
+
 	@PostMapping("/_list")
-	public PersonListDto getPersonList(@RequestBody Map<String, Object> parameters) {
-		return personService.getPersonList(ControllerUtilities.getPageNumber(parameters),
-				ControllerUtilities.getPageSize(parameters), ControllerUtilities.getFilterParameters(parameters));
+	public PersonListDto getPersonList(@RequestBody PersonListRequest personListRequest) {
+		return personService.getPersonList(personListRequest.getPageNumber(), personListRequest.getPageSize(),
+				personListRequest.getPersonProbe());
 	}
 
 	@PostMapping(value = "/_report", consumes = { MediaType.APPLICATION_FORM_URLENCODED_VALUE,
 			MediaType.APPLICATION_JSON_VALUE })
-	public ResponseEntity<FileSystemResource> getPersonListAsFile(HttpEntity<Map<String, Object>> entity) {
-		var parameters = entity.getBody();
-		var outputFile = personService
-				.getFilteredPersonsAsFileResource(ControllerUtilities.getFilterParameters(parameters));
+	public ResponseEntity<FileSystemResource> getPersonListAsFile(@RequestBody PersonListRequest personListRequest) {
+		var outputFile = personService.getFilteredPersonsAsFileResource(personListRequest.getPersonProbe());
 		HttpHeaders responseHeaders = new HttpHeaders();
 		responseHeaders.set(HttpHeaders.CONTENT_DISPOSITION,
 				"attachment; filename=\"%s\"".formatted(outputFile.fileName()));

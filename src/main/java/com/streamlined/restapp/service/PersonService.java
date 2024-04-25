@@ -1,6 +1,5 @@
 package com.streamlined.restapp.service;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -8,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.streamlined.restapp.controller.UploadResponse;
 import com.streamlined.restapp.model.EssentialPersonDto;
+import com.streamlined.restapp.model.Person;
 import com.streamlined.restapp.model.PersonDto;
 import com.streamlined.restapp.model.PersonListDto;
 import com.streamlined.restapp.model.ReportDto;
@@ -24,12 +24,14 @@ public interface PersonService {
 
 	void removeById(Long id);
 
-	Stream<EssentialPersonDto> getFilteredPersonStream(Map<String, Object> filterParameters);
+	void removeAllPersons();
 
-	ReportDto getFilteredPersonsAsFileResource(Map<String, Object> filterParameters);
+	Stream<EssentialPersonDto> getFilteredPersonStream(Person probe);
 
-	PersonListDto getPersonList(int page, int size, Map<String, Object> filterParameters);
-	
+	ReportDto getFilteredPersonsAsFileResource(Person personPerson);
+
+	PersonListDto getPersonList(int page, int size, Person probe);
+
 	UploadResponse uploadFile(MultipartFile multipartFile);
 
 }
