@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -70,10 +71,18 @@ public class DefaultPersonService implements PersonService {
 
 	@Override
 	public PersonListDto getPersonList(int pageNumber, int pageSize, Person personProbe) {
-		Example<Person> example = Example.of(personProbe);
+		Example<Person> example = Example.of(personProbe, getPersonMatcher());
 		var pageable = PageRequest.of(pageNumber, pageSize);
 		Page<Person> personList = personRepository.findAll(example, pageable);
 		return new PersonListDto(personList.map(personMapper::toListDto).toList(), personList.getTotalPages());
+	}
+
+	private ExampleMatcher getPersonMatcher() {
+		return ExampleMatcher.matchingAny()
+				.withIgnorePaths("countryOfOrigin.id", "countryOfOrigin.continent", "countryOfOrigin.population",
+						"countryOfOrigin.square", "citizenship.id", "citizenship.continent", "citizenship.population",
+						"citizenship.square")
+				.withIgnoreNullValues();
 	}
 
 	@Override
