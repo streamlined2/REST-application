@@ -1,6 +1,7 @@
 package com.streamlined.restapp.model;
 
 import org.hibernate.annotations.NaturalId;
+import org.hibernate.validator.constraints.Length;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -50,7 +51,7 @@ public class Country {
 	private Continent continent;
 
 	@NotBlank(message = "Country capital should not be blank")
-	@Size(min = 3, message = "Country capital must be of length 3 or greater")
+	@Length(min = 3, message = "Country capital must be of length 3 or greater")
 	@Column(name = "capital", nullable = false)
 	private String capital;
 

@@ -11,7 +11,7 @@ public class RestExceptionHandler {
 
 	@ExceptionHandler(EntityNotFoundException.class)
 	public ResponseEntity<String> handleEntityNotFoundException(EntityNotFoundException exception) {
-		return ResponseEntity.badRequest().body(exception.getMessage());
+		return ResponseEntity.notFound().build();
 	}
 
 	@ExceptionHandler(IncorrectDataException.class)
@@ -21,11 +21,6 @@ public class RestExceptionHandler {
 
 	@ExceptionHandler(InvalidFormatException.class)
 	public ResponseEntity<String> handleInvalidJsonFormatException(InvalidFormatException exception) {
-		return ResponseEntity.badRequest().body(exception.getMessage());
-	}
-
-	@ExceptionHandler(IntrospectionException.class)
-	public ResponseEntity<String> handleIntrospectionException(IntrospectionException exception) {
 		return ResponseEntity.badRequest().body(exception.getMessage());
 	}
 
