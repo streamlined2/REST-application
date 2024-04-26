@@ -200,8 +200,18 @@ class CountryControllerTest {
 		assertThat(updatedEntity).contains(newCountry);
 	}
 
+	void testUpdateCountryFailNonUniqueCountryName(String countryName) throws Exception {
+		final long COUNTRY_ID = 2L;
+		final Country newCountry = Country.builder().name("USA").continent(Continent.ASIA).capital("New Delhi")
+				.population(1428627663).square(3287263).build();
+		String requestBody = mapper.writeValueAsString(newCountry);
+
+		mvc.perform(put("/api/country/{id}", COUNTRY_ID).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+				.andExpectAll(status().isBadRequest());
+	}
+
 	@ParameterizedTest
-	@ValueSource(strings = { "USA", "   ", "US" })
+	@ValueSource(strings = { "   ", "US" })
 	void testUpdateCountryFailInvalidCountryName(String countryName) throws Exception {
 		final long COUNTRY_ID = 1L;
 		final Country newCountry = Country.builder().name(countryName).continent(Continent.ASIA).capital("New Delhi")
