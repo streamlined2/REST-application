@@ -24,7 +24,10 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.streamlined.restapp.exception.ParseException;
 import com.streamlined.restapp.model.Person;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class ParallelPersonParser implements PersonParser {
 
 	private static final String SOURCE_FILE_PATTERN = "*.json";
@@ -67,6 +70,7 @@ public class ParallelPersonParser implements PersonParser {
 				pathStream.forEach(sourceFileQueue::add);
 				performParseTasks();
 			} catch (IOException e) {
+				log.error("Error iterating through directory {}", dataPath);
 				throw new ParseException("Error iterating through directory %s".formatted(dataPath), e);
 			}
 		}
@@ -95,6 +99,7 @@ public class ParallelPersonParser implements PersonParser {
 					resultQueue.put(entity);
 				}
 			} catch (IOException | InterruptedException e) {
+				log.error("Error parsing file {}", filePath.getFileName());
 				throw new ParseException("Error parsing file %s".formatted(filePath.getFileName()), e);
 			}
 		}

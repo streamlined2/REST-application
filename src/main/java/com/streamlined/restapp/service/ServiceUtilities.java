@@ -16,8 +16,10 @@ import com.streamlined.restapp.exception.IncorrectDataException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 @UtilityClass
+@Slf4j
 public class ServiceUtilities {
 
 	private static final String PERSON_SOURCE_DIRECTORY_PREFIX = "person_";
@@ -27,8 +29,9 @@ public class ServiceUtilities {
 	public void checkIfValid(Validator validator, Object entity, String entityType) {
 		var violations = validator.validate(entity);
 		if (!violations.isEmpty()) {
-			throw new IncorrectDataException(
-					"Incorrect %s data: %s".formatted(entityType, ServiceUtilities.getViolations(violations)));
+			var violationDescription = ServiceUtilities.getViolations(violations);
+			log.error("Incorrect {} data: {}", entityType, violationDescription);
+			throw new IncorrectDataException("Incorrect %s data: %s".formatted(entityType, violationDescription));
 		}
 	}
 
@@ -48,6 +51,7 @@ public class ServiceUtilities {
 			Files.copy(inputStream, file, StandardCopyOption.REPLACE_EXISTING);
 			return folder;
 		} catch (IOException e) {
+			log.error("Cannot copy uploaded file");
 			throw new FileStorageException("Cannot copy uploaded file", e);
 		}
 	}
@@ -63,6 +67,7 @@ public class ServiceUtilities {
 				}
 				Files.delete(folder);
 			} catch (IOException e) {
+				log.error("Error while cleaning temporary folder with files");
 				throw new FileStorageException("Error while cleaning temporary folder with files", e);
 			}
 		}

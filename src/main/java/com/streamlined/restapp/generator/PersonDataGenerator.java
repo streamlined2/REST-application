@@ -21,6 +21,9 @@ import com.streamlined.restapp.model.Country;
 import com.streamlined.restapp.model.Person;
 import com.streamlined.restapp.model.Sex;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class PersonDataGenerator {
 
 	private static final Path RESULT_FILE_DIRECTORY = Path.of("src", "main", "resources", "data");
@@ -120,6 +123,7 @@ public class PersonDataGenerator {
 			}
 			mapper.writeValue(writer, persons);
 		} catch (IOException e) {
+			log.error("Can't write generated data");
 			throw new GeneratorException("Can't write generated data", e);
 		}
 	}
@@ -128,6 +132,7 @@ public class PersonDataGenerator {
 		try {
 			Files.createDirectories(resultFileDirectory);
 		} catch (IOException e) {
+			log.error("Can't create directory for data to generate");
 			throw new GeneratorException("Can't create directory for data to generate", e);
 		}
 	}

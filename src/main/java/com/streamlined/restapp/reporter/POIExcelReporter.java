@@ -23,7 +23,10 @@ import org.springframework.stereotype.Component;
 import com.streamlined.restapp.exception.ReportException;
 import com.streamlined.restapp.model.Person;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class POIExcelReporter implements Reporter {
 
 	private static final String WORKBOOK_FILE_PREFIX = "workbook_";
@@ -37,6 +40,7 @@ public class POIExcelReporter implements Reporter {
 		try (Workbook workbook = new HSSFWorkbook()) {
 			return new FileSystemResource(createWorkbookFile(workbook, personStream));
 		} catch (IOException e) {
+			log.error("Error while creating workbook");
 			throw new ReportException("Error while creating workbook", e);
 		}
 	}
@@ -52,6 +56,7 @@ public class POIExcelReporter implements Reporter {
 					StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE), BUFFER_SIZE));
 			return file;
 		} catch (IOException e) {
+			log.error("Error while creating workbook file");
 			throw new ReportException("Error while creating workbook file", e);
 		}
 	}

@@ -15,8 +15,11 @@ import org.springframework.stereotype.Component;
 import com.streamlined.restapp.exception.ReportException;
 import com.streamlined.restapp.model.Person;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
 @Primary
+@Slf4j
 public class CSVReporter implements Reporter {
 
 	private static final MediaType CSV_FILE_MEDIA_TYPE = new MediaType("text", "csv");
@@ -32,6 +35,7 @@ public class CSVReporter implements Reporter {
 			fillInWorkbookFile(file, personStream);
 			return new FileSystemResource(file);
 		} catch (IOException e) {
+			log.error("Error while creating workbook");
 			throw new ReportException("Error while creating workbook", e);
 		}
 	}
