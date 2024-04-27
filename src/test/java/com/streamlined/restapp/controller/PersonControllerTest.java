@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -31,13 +33,17 @@ import com.streamlined.restapp.dao.PersonRepository;
 import com.streamlined.restapp.model.Color;
 import com.streamlined.restapp.model.Continent;
 import com.streamlined.restapp.model.Country;
+import com.streamlined.restapp.model.EssentialPersonDto;
 import com.streamlined.restapp.model.Person;
+import com.streamlined.restapp.model.PersonListDto;
 import com.streamlined.restapp.model.Sex;
 
 @SpringBootTest(webEnvironment = WebEnvironment.MOCK, classes = RestApplication.class)
 @AutoConfigureMockMvc
 @Transactional
 class PersonControllerTest {
+
+	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
 	@Autowired
 	private MockMvc mvc;
@@ -73,7 +79,7 @@ class PersonControllerTest {
 		var collectionType = mapper.getTypeFactory().constructCollectionType(List.class, Person.class);
 		var value = mapper.readValue(content, collectionType);
 
-		assertThat(value).isNotNull().asList().isEqualTo(personList);
+		assertThat(value).isNotNull().asList().usingRecursiveComparison().isEqualTo(personList);
 	}
 
 	@Test
@@ -92,7 +98,7 @@ class PersonControllerTest {
 		var content = mvcResult.getResponse().getContentAsString();
 		var person = mapper.readValue(content, Person.class);
 
-		assertThat(person).isNotNull().isEqualTo(newPerson);
+		assertThat(person).isNotNull().usingRecursiveComparison().isEqualTo(newPerson);
 	}
 
 	@Test
@@ -366,6 +372,250 @@ class PersonControllerTest {
 
 		var existingEntitiesCount = personRepository.count();
 		assertThat(existingEntitiesCount).isZero();
+	}
+
+	@Test
+	void testGetPersonListFilterByPropertyValueSuccess() throws Exception {
+		final Country country = Country.builder().id(1L).name("India").continent(Continent.ASIA).capital("New Delhi")
+				.population(1428627663).square(3287263).build();
+		final List<Person> personList = List.of(
+				Person.builder().name("John Smith").birthday(LocalDate.of(1990, 1, 1)).sex(Sex.MALE)
+						.eyeColor(Color.GREEN).hairColor(Color.BLACK).weight(BigDecimal.valueOf(80))
+						.height(BigDecimal.valueOf(190)).countryOfOrigin(country).citizenship(country)
+						.favoriteMeals("apple,pear,banana").build(),
+				Person.builder().name("Jacky Blacksmith").birthday(LocalDate.of(1980, 1, 1)).sex(Sex.FEMALE)
+						.eyeColor(Color.RED).hairColor(Color.YELLOW).weight(BigDecimal.valueOf(70))
+						.height(BigDecimal.valueOf(160)).countryOfOrigin(country).citizenship(country)
+						.favoriteMeals("banana,apple,pear").build(),
+				Person.builder().name("Ruth Glanshow").birthday(LocalDate.of(2000, 1, 1)).sex(Sex.FEMALE)
+						.eyeColor(Color.RED).hairColor(Color.YELLOW).weight(BigDecimal.valueOf(50))
+						.height(BigDecimal.valueOf(120)).countryOfOrigin(country).citizenship(country)
+						.favoriteMeals("pear,apple,banana").build(),
+				Person.builder().name("Richard Galsworthy").birthday(LocalDate.of(1990, 1, 1)).sex(Sex.MALE)
+						.eyeColor(Color.GREEN).hairColor(Color.BLACK).weight(BigDecimal.valueOf(80))
+						.height(BigDecimal.valueOf(190)).countryOfOrigin(country).citizenship(country)
+						.favoriteMeals("apple,pear,banana").build(),
+				Person.builder().name("Sheila Winslow").birthday(LocalDate.of(1980, 1, 1)).sex(Sex.FEMALE)
+						.eyeColor(Color.RED).hairColor(Color.YELLOW).weight(BigDecimal.valueOf(70))
+						.height(BigDecimal.valueOf(160)).countryOfOrigin(country).citizenship(country)
+						.favoriteMeals("banana,apple,pear").build(),
+				Person.builder().name("Becky Steep").birthday(LocalDate.of(2000, 1, 1)).sex(Sex.FEMALE)
+						.eyeColor(Color.RED).hairColor(Color.YELLOW).weight(BigDecimal.valueOf(50))
+						.height(BigDecimal.valueOf(120)).countryOfOrigin(country).citizenship(country)
+						.favoriteMeals("pear,apple,banana").build());
+		final List<EssentialPersonDto> result = List.of(
+				EssentialPersonDto.builder().name("Sheila Winslow").birthday(LocalDate.of(1980, 1, 1)).sex(Sex.FEMALE)
+						.eyeColor(Color.RED).height(BigDecimal.valueOf(160)).build(),
+				EssentialPersonDto.builder().name("Becky Steep").birthday(LocalDate.of(2000, 1, 1)).sex(Sex.FEMALE)
+						.eyeColor(Color.RED).height(BigDecimal.valueOf(120)).build());
+		personRepository.deleteAll();
+		personRepository.saveAll(personList);
+
+		var requestBody = """
+				{
+				        "sex":"FEMALE",
+				        "eyeColor":"RED",
+				        "hairColor":"YELLOW",
+				        "page":1,
+				        "size":2
+				}
+				""";
+		MvcResult mvcResult = mvc
+				.perform(post("/api/person/_list").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+				.andExpectAll(status().isOk(), content().contentType(MediaType.APPLICATION_JSON)).andReturn();
+
+		var content = mvcResult.getResponse().getContentAsString();
+		var response = mapper.readValue(content, PersonListDto.class);
+
+		assertThat(response).isNotNull();
+		assertThat(response.totalPages()).isEqualTo(2);
+		assertThat(response.list()).hasSize(2).usingRecursiveComparison(RecursiveComparisonConfiguration.builder()
+				.withComparedFields("name", "birthday", "sex", "eyeColor", "height").build()).isEqualTo(result);
+	}
+
+	@Test
+	void testGetPersonListFilterByCountryReferenceSuccess() throws Exception {
+		final Country usa = Country.builder().id(1L).name("USA").continent(Continent.NORTH_AMERICA)
+				.capital("Washington").population(1428627663).square(3287263).build();
+		final Country uk = Country.builder().id(2L).name("United Kingdom").continent(Continent.EUROPE).capital("London")
+				.population(1428627663).square(3287263).build();
+		final Country france = Country.builder().id(3L).name("France").continent(Continent.EUROPE).capital("Paris")
+				.population(1428627663).square(3287263).build();
+		final List<Person> personList = List.of(
+				Person.builder().name("John Smith").birthday(LocalDate.of(1990, 1, 1)).sex(Sex.MALE)
+						.eyeColor(Color.GREEN).hairColor(Color.BLACK).weight(BigDecimal.valueOf(80))
+						.height(BigDecimal.valueOf(190)).countryOfOrigin(usa).citizenship(usa)
+						.favoriteMeals("apple,pear,banana").build(),
+				Person.builder().name("Jacky Blacksmith").birthday(LocalDate.of(1980, 1, 1)).sex(Sex.FEMALE)
+						.eyeColor(Color.RED).hairColor(Color.YELLOW).weight(BigDecimal.valueOf(70))
+						.height(BigDecimal.valueOf(160)).countryOfOrigin(uk).citizenship(uk)
+						.favoriteMeals("banana,apple,pear").build(),
+				Person.builder().name("Ruth Glanshow").birthday(LocalDate.of(2000, 1, 1)).sex(Sex.FEMALE)
+						.eyeColor(Color.RED).hairColor(Color.YELLOW).weight(BigDecimal.valueOf(50))
+						.height(BigDecimal.valueOf(120)).countryOfOrigin(france).citizenship(france)
+						.favoriteMeals("pear,apple,banana").build(),
+				Person.builder().name("Richard Galsworthy").birthday(LocalDate.of(1990, 1, 1)).sex(Sex.MALE)
+						.eyeColor(Color.GREEN).hairColor(Color.BLACK).weight(BigDecimal.valueOf(80))
+						.height(BigDecimal.valueOf(190)).countryOfOrigin(usa).citizenship(usa)
+						.favoriteMeals("apple,pear,banana").build(),
+				Person.builder().name("Sheila Winslow").birthday(LocalDate.of(1980, 1, 1)).sex(Sex.FEMALE)
+						.eyeColor(Color.RED).hairColor(Color.YELLOW).weight(BigDecimal.valueOf(70))
+						.height(BigDecimal.valueOf(160)).countryOfOrigin(uk).citizenship(uk)
+						.favoriteMeals("banana,apple,pear").build(),
+				Person.builder().name("Becky Steep").birthday(LocalDate.of(2000, 1, 1)).sex(Sex.FEMALE)
+						.eyeColor(Color.RED).hairColor(Color.YELLOW).weight(BigDecimal.valueOf(50))
+						.height(BigDecimal.valueOf(120)).countryOfOrigin(france).citizenship(france)
+						.favoriteMeals("pear,apple,banana").build());
+		final List<EssentialPersonDto> result = List.of(
+				EssentialPersonDto.builder().name("John Smith").birthday(LocalDate.of(1990, 1, 1)).sex(Sex.MALE)
+						.eyeColor(Color.GREEN).height(BigDecimal.valueOf(190)).build(),
+				EssentialPersonDto.builder().name("Richard Galsworthy").birthday(LocalDate.of(1990, 1, 1)).sex(Sex.MALE)
+						.eyeColor(Color.GREEN).height(BigDecimal.valueOf(190)).build());
+		personRepository.deleteAll();
+		personRepository.saveAll(personList);
+
+		var requestBody = """
+				{
+				           "countryOfOrigin":{
+				               "name": "USA"
+				           },
+				           "citizenship":{
+				           		"capital": "Washington"
+				           },
+					       "page":0,
+					       "size":2
+				}
+				""";
+		MvcResult mvcResult = mvc
+				.perform(post("/api/person/_list").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+				.andExpectAll(status().isOk(), content().contentType(MediaType.APPLICATION_JSON)).andReturn();
+
+		var content = mvcResult.getResponse().getContentAsString();
+		var response = mapper.readValue(content, PersonListDto.class);
+
+		assertThat(response).isNotNull();
+		assertThat(response.totalPages()).isEqualTo(1);
+		assertThat(response.list()).hasSize(2).usingRecursiveComparison(RecursiveComparisonConfiguration.builder()
+				.withComparedFields("name", "birthday", "sex", "eyeColor", "height").build()).isEqualTo(result);
+	}
+
+	@Test
+	void testGetPersonListFilterByCountryIdSuccess() throws Exception {
+		final Country usa = Country.builder().id(1L).name("USA").continent(Continent.NORTH_AMERICA)
+				.capital("Washington").population(1428627663).square(3287263).build();
+		final Country uk = Country.builder().id(2L).name("United Kingdom").continent(Continent.EUROPE).capital("London")
+				.population(1428627663).square(3287263).build();
+		final Country france = Country.builder().id(3L).name("France").continent(Continent.EUROPE).capital("Paris")
+				.population(1428627663).square(3287263).build();
+		final List<Person> personList = List.of(
+				Person.builder().name("John Smith").birthday(LocalDate.of(1990, 1, 1)).sex(Sex.MALE)
+						.eyeColor(Color.GREEN).hairColor(Color.BLACK).weight(BigDecimal.valueOf(80))
+						.height(BigDecimal.valueOf(190)).countryOfOrigin(usa).citizenship(usa)
+						.favoriteMeals("apple,pear,banana").build(),
+				Person.builder().name("Jacky Blacksmith").birthday(LocalDate.of(1980, 1, 1)).sex(Sex.FEMALE)
+						.eyeColor(Color.RED).hairColor(Color.YELLOW).weight(BigDecimal.valueOf(70))
+						.height(BigDecimal.valueOf(160)).countryOfOrigin(uk).citizenship(uk)
+						.favoriteMeals("banana,apple,pear").build(),
+				Person.builder().name("Ruth Glanshow").birthday(LocalDate.of(2000, 1, 1)).sex(Sex.FEMALE)
+						.eyeColor(Color.RED).hairColor(Color.YELLOW).weight(BigDecimal.valueOf(50))
+						.height(BigDecimal.valueOf(120)).countryOfOrigin(france).citizenship(france)
+						.favoriteMeals("pear,apple,banana").build(),
+				Person.builder().name("Richard Galsworthy").birthday(LocalDate.of(1990, 1, 1)).sex(Sex.MALE)
+						.eyeColor(Color.GREEN).hairColor(Color.BLACK).weight(BigDecimal.valueOf(80))
+						.height(BigDecimal.valueOf(190)).countryOfOrigin(usa).citizenship(usa)
+						.favoriteMeals("apple,pear,banana").build(),
+				Person.builder().name("Sheila Winslow").birthday(LocalDate.of(1980, 1, 1)).sex(Sex.FEMALE)
+						.eyeColor(Color.RED).hairColor(Color.YELLOW).weight(BigDecimal.valueOf(70))
+						.height(BigDecimal.valueOf(160)).countryOfOrigin(uk).citizenship(uk)
+						.favoriteMeals("banana,apple,pear").build(),
+				Person.builder().name("Becky Steep").birthday(LocalDate.of(2000, 1, 1)).sex(Sex.FEMALE)
+						.eyeColor(Color.RED).hairColor(Color.YELLOW).weight(BigDecimal.valueOf(50))
+						.height(BigDecimal.valueOf(120)).countryOfOrigin(france).citizenship(france)
+						.favoriteMeals("pear,apple,banana").build());
+		final List<EssentialPersonDto> result = List.of(
+				EssentialPersonDto.builder().name("John Smith").birthday(LocalDate.of(1990, 1, 1)).sex(Sex.MALE)
+						.eyeColor(Color.GREEN).height(BigDecimal.valueOf(190)).build(),
+				EssentialPersonDto.builder().name("Richard Galsworthy").birthday(LocalDate.of(1990, 1, 1)).sex(Sex.MALE)
+						.eyeColor(Color.GREEN).height(BigDecimal.valueOf(190)).build());
+		personRepository.deleteAll();
+		personRepository.saveAll(personList);
+
+		var requestBody = """
+				{
+				           "countryOfOrigin":{
+				           		"id":1
+				           },
+					       "page":0,
+					       "size":2
+				}
+				""";
+		MvcResult mvcResult = mvc
+				.perform(post("/api/person/_list").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+				.andExpectAll(status().isOk(), content().contentType(MediaType.APPLICATION_JSON)).andReturn();
+
+		var content = mvcResult.getResponse().getContentAsString();
+		var response = mapper.readValue(content, PersonListDto.class);
+
+		assertThat(response).isNotNull();
+		assertThat(response.totalPages()).isEqualTo(1);
+		assertThat(response.list()).hasSize(2).usingRecursiveComparison(RecursiveComparisonConfiguration.builder()
+				.withComparedFields("name", "birthday", "sex", "eyeColor", "height").build()).isEqualTo(result);
+	}
+
+	@Test
+	void testGetPersonListAsFileSuccess() throws Exception {
+		final Country usa = Country.builder().id(1L).name("USA").continent(Continent.NORTH_AMERICA)
+				.capital("Washington").population(1428627663).square(3287263).build();
+		final Country france = Country.builder().id(2L).name("France").continent(Continent.EUROPE).capital("Paris")
+				.population(1428627663).square(3287263).build();
+		final List<Person> personList = List.of(
+				Person.builder().name("John Smith").birthday(LocalDate.of(1990, 1, 1)).sex(Sex.MALE)
+						.eyeColor(Color.GREEN).hairColor(Color.BLACK).weight(BigDecimal.valueOf(80))
+						.height(BigDecimal.valueOf(190)).countryOfOrigin(usa).citizenship(usa)
+						.favoriteMeals("apple,pear,banana").build(),
+				Person.builder().name("Jacky Blacksmith").birthday(LocalDate.of(1980, 1, 1)).sex(Sex.FEMALE)
+						.eyeColor(Color.BLUE).hairColor(Color.BLACK).weight(BigDecimal.valueOf(70))
+						.height(BigDecimal.valueOf(160)).countryOfOrigin(usa).citizenship(usa)
+						.favoriteMeals("banana,apple,pear").build(),
+				Person.builder().name("Ruth Glanshow").birthday(LocalDate.of(2000, 1, 1)).sex(Sex.FEMALE)
+						.eyeColor(Color.RED).hairColor(Color.YELLOW).weight(BigDecimal.valueOf(50))
+						.height(BigDecimal.valueOf(120)).countryOfOrigin(france).citizenship(france)
+						.favoriteMeals("pear,apple,banana").build(),
+				Person.builder().name("Richard Galsworthy").birthday(LocalDate.of(1990, 1, 1)).sex(Sex.MALE)
+						.eyeColor(Color.GREEN).hairColor(Color.BLACK).weight(BigDecimal.valueOf(80))
+						.height(BigDecimal.valueOf(190)).countryOfOrigin(usa).citizenship(usa)
+						.favoriteMeals("apple,pear,banana").build(),
+				Person.builder().name("Sheila Winslow").birthday(LocalDate.of(1980, 1, 1)).sex(Sex.FEMALE)
+						.eyeColor(Color.BROWN).hairColor(Color.GRAY).weight(BigDecimal.valueOf(70))
+						.height(BigDecimal.valueOf(160)).countryOfOrigin(usa).citizenship(usa)
+						.favoriteMeals("banana,apple,pear").build(),
+				Person.builder().name("Becky Steep").birthday(LocalDate.of(2000, 1, 1)).sex(Sex.FEMALE)
+						.eyeColor(Color.RED).hairColor(Color.YELLOW).weight(BigDecimal.valueOf(50))
+						.height(BigDecimal.valueOf(120)).countryOfOrigin(france).citizenship(france)
+						.favoriteMeals("pear,apple,banana").build());
+		personRepository.deleteAll();
+		personRepository.saveAll(personList);
+
+		var requestBody = """
+				{
+				       "sex":"FEMALE",
+				       "eyeColor":"RED",
+				       "hairColor":"YELLOW"
+				}
+				""";
+		var reply = "Ruth Glanshow;2000-01-01;FEMALE;RED;120" + LINE_SEPARATOR + "Becky Steep;2000-01-01;FEMALE;RED;120"
+				+ LINE_SEPARATOR;
+		MvcResult mvcResult = mvc
+				.perform(post("/api/person/_report").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+				.andExpectAll(status().isOk()).andReturn();
+
+		var contentDispositionHeader = mvcResult.getResponse().getHeader(HttpHeaders.CONTENT_DISPOSITION);
+		var contentType = mvcResult.getResponse().getContentType();
+		var content = mvcResult.getResponse().getContentAsByteArray();
+
+		assertThat(contentDispositionHeader).matches("attachment; filename=\"\\w+.csv\"");
+		assertThat(contentType).isEqualTo("text/csv");
+		assertThat(content).isEqualTo(reply.getBytes());
 	}
 
 }

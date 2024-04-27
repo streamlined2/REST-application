@@ -78,10 +78,8 @@ public class DefaultPersonService implements PersonService {
 	}
 
 	private ExampleMatcher getPersonMatcher() {
-		return ExampleMatcher.matchingAny()
-				.withIgnorePaths("countryOfOrigin.id", "countryOfOrigin.continent", "countryOfOrigin.population",
-						"countryOfOrigin.square", "citizenship.id", "citizenship.continent", "citizenship.population",
-						"citizenship.square")
+		return ExampleMatcher.matchingAny().withIgnorePaths("countryOfOrigin.continent", "countryOfOrigin.population",
+				"countryOfOrigin.square", "citizenship.continent", "citizenship.population", "citizenship.square")
 				.withIgnoreNullValues();
 	}
 

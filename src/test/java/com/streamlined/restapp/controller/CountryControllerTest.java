@@ -103,7 +103,7 @@ class CountryControllerTest {
 		var content = mvcResult.getResponse().getContentAsString();
 		var value = mapper.readValue(content, Country.class);
 
-		assertThat(value).isNotNull().isEqualTo(COUNTRY_LIST.get(COUNTRY_INDEX));
+		assertThat(value).isNotNull().usingRecursiveComparison().isEqualTo(COUNTRY_LIST.get(COUNTRY_INDEX));
 	}
 
 	@Test
