@@ -3,6 +3,7 @@ package com.streamlined.restapp.controller;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -23,6 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +46,7 @@ import com.streamlined.restapp.model.Sex;
 class PersonControllerTest {
 
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+	private static final String MULTIPART_FILE_NAME = "file";
 
 	@Autowired
 	private MockMvc mvc;
@@ -616,6 +619,39 @@ class PersonControllerTest {
 		assertThat(contentDispositionHeader).matches("attachment; filename=\"\\w+.csv\"");
 		assertThat(contentType).isEqualTo("text/csv");
 		assertThat(content).isEqualTo(reply.getBytes());
+	}
+
+	@Test
+	void testUploadFileSuccess() throws Exception {
+		final Country usa = Country.builder().id(1L).name("USA").continent(Continent.NORTH_AMERICA)
+				.capital("Washington").population(1428627663).square(3287263).build();
+		final List<Person> personList = List.of(
+				Person.builder().name("John Smith").birthday(LocalDate.of(1990, 1, 1)).sex(Sex.MALE)
+						.eyeColor(Color.GREEN).hairColor(Color.BLACK).weight(BigDecimal.valueOf(80))
+						.height(BigDecimal.valueOf(190)).countryOfOrigin(usa).citizenship(usa)
+						.favoriteMeals("apple,pear,banana").build(),
+				Person.builder().name("Jacky Blacksmith").birthday(LocalDate.of(1980, 1, 1)).sex(Sex.FEMALE)
+						.eyeColor(Color.BLUE).hairColor(Color.BLACK).weight(BigDecimal.valueOf(70))
+						.height(BigDecimal.valueOf(160)).countryOfOrigin(usa).citizenship(usa)
+						.favoriteMeals("banana,apple,pear").build(),
+				Person.builder().name("Ruth Glanshow").birthday(LocalDate.of(2000, 1, 1)).sex(Sex.FEMALE)
+						.eyeColor(Color.RED).hairColor(Color.YELLOW).weight(BigDecimal.valueOf(50))
+						.height(BigDecimal.valueOf(120)).countryOfOrigin(usa).citizenship(usa)
+						.favoriteMeals("pear,apple,banana").build());
+		var multipartFileContent = mapper.writeValueAsBytes(personList);
+
+		personRepository.deleteAll();
+
+		MockMultipartFile multipartFile = new MockMultipartFile(MULTIPART_FILE_NAME, multipartFileContent);
+		MvcResult mvcResult = mvc.perform(multipart("/api/person/upload").file(multipartFile))
+				.andExpectAll(status().isOk()).andReturn();
+
+		var response = mapper.readValue(mvcResult.getResponse().getContentAsString(), UploadResponse.class);
+		assertThat(response.succeededEntries()).isEqualTo(personList.size());
+		assertThat(response.failedEntries()).isZero();
+
+		assertThat(personRepository.findAll()).asList().usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
+				.containsExactlyInAnyOrderElementsOf(personList);
 	}
 
 }
