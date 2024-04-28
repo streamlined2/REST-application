@@ -18,6 +18,10 @@ import com.streamlined.restapp.service.CountryService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Controller class for country entity
+ */
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/country")

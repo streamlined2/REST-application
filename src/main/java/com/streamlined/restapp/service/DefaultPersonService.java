@@ -26,6 +26,10 @@ import com.streamlined.restapp.reporter.Reporter;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Service class for person entity
+ */
+
 @Service
 @RequiredArgsConstructor
 public class DefaultPersonService implements PersonService {

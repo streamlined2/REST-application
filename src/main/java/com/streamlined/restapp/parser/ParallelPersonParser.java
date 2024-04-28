@@ -26,6 +26,10 @@ import com.streamlined.restapp.model.Person;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Class parses input JSON files and returns stream of person entities
+ */
+
 @Component
 @Slf4j
 public class ParallelPersonParser implements PersonParser {
@@ -44,6 +48,12 @@ public class ParallelPersonParser implements PersonParser {
 		collectionType = mapper.getTypeFactory().constructCollectionType(List.class, Person.class);
 	}
 
+	/**
+	 * Method reads data from file {@code path}, parses data and creates stream of person entities 
+	 * @param path input file to be parsed
+	 * @return stream of person entities
+	 * @throws ParseException if input file cannot be found, read, parsed, or closed
+	 */
 	public Stream<Person> stream(Path path) {
 		var iterator = new StreamingIterator(path);
 		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator, 0), false).filter(Objects::nonNull);

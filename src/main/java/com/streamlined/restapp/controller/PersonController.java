@@ -25,6 +25,10 @@ import com.streamlined.restapp.service.PersonService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Controller class for person entity
+ */
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/person")

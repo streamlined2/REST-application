@@ -23,6 +23,16 @@ import com.streamlined.restapp.model.Sex;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Class generates random person entities and saves them in data files.
+ * 
+ * @param RESULT_FILE_DIRECTORY data file folder
+ * @param FILE_NAME             data file name prefix
+ * @param FILE_EXTENSION        data file extension
+ * @param PERSON_COUNT          total number of person entities to be created
+ * @param FILE_COUNT            number of data files to be created
+ */
+
 @Slf4j
 public class PersonDataGenerator {
 
@@ -193,6 +203,13 @@ public class PersonDataGenerator {
 		return b.toString();
 	}
 
+	/**
+	 * Method generates total number of person entities {@code PERSON_COUNT} and
+	 * saves them as {@code FILE_COUNT} data files in folder
+	 * {@code RESULT_FILE_DIRECTORY}
+	 * 
+	 * @param args this parameter is never used
+	 */
 	public static void main(String... args) {
 		new PersonDataGenerator().createData(RESULT_FILE_DIRECTORY, PERSON_COUNT, FILE_COUNT);
 	}

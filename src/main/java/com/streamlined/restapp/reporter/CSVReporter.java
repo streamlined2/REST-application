@@ -17,6 +17,10 @@ import com.streamlined.restapp.model.Person;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Class creates CSV report file and fills it with received person entities
+ */
+
 @Component
 @Primary
 @Slf4j
@@ -28,6 +32,12 @@ public class CSVReporter implements Reporter {
 	private static final String WORKBOOK_FILE_SUFFIX = ".csv";
 	private static final String FIELD_SEPARATOR = ";";
 
+	/**
+	 * Method accepts stream of person entities and saves data as temporary file in CSV format
+	 * @param personStream stream of person entities
+	 * @return created file in CSV format
+	 * @throws ReportException if file cannot be created or filled in  
+	 */
 	@Override
 	public FileSystemResource getFileResource(Stream<Person> personStream) {
 		try {

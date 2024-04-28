@@ -13,6 +13,10 @@ import com.streamlined.restapp.model.CountryMapper;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Service class for country entity
+ */
+
 @Service
 @RequiredArgsConstructor
 public class DefaultCountryService implements CountryService {
