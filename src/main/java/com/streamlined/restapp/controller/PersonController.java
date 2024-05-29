@@ -21,6 +21,7 @@ import com.streamlined.restapp.Utilities;
 import com.streamlined.restapp.dto.PersonDto;
 import com.streamlined.restapp.dto.PersonListDto;
 import com.streamlined.restapp.dto.PersonListRequest;
+import com.streamlined.restapp.dto.ReportDto;
 import com.streamlined.restapp.dto.UploadResponse;
 import com.streamlined.restapp.exception.EntityNotFoundException;
 import com.streamlined.restapp.service.PersonService;
@@ -52,7 +53,7 @@ public class PersonController {
 
 	@PostMapping
 	public ResponseEntity<Void> addPerson(@RequestBody PersonDto person, HttpServletRequest servletRequest) {
-		var savedPerson = personService.save(person);
+		PersonDto savedPerson = personService.save(person);
 		return ResponseEntity.created(Utilities.getResourceURI(servletRequest, savedPerson.id())).build();
 	}
 
@@ -83,7 +84,7 @@ public class PersonController {
 	@PostMapping(value = "/_report", consumes = { MediaType.APPLICATION_FORM_URLENCODED_VALUE,
 			MediaType.APPLICATION_JSON_VALUE })
 	public ResponseEntity<FileSystemResource> getPersonListAsFile(@RequestBody PersonListRequest personListRequest) {
-		var outputFile = personService.getFilteredPersonsAsFileResource(personListRequest.getPersonProbe());
+		ReportDto outputFile = personService.getFilteredPersonsAsFileResource(personListRequest.getPersonProbe());
 		HttpHeaders responseHeaders = new HttpHeaders();
 		responseHeaders.set(HttpHeaders.CONTENT_DISPOSITION,
 				"attachment; filename=\"%s\"".formatted(outputFile.fileName()));
@@ -93,7 +94,7 @@ public class PersonController {
 
 	@PostMapping(value = "/upload")
 	public ResponseEntity<UploadResponse> uploadFile(@RequestParam("file") MultipartFile multipartFile) {
-		var uploadStatus = personService.uploadFile(multipartFile);
+		UploadResponse uploadStatus = personService.uploadFile(multipartFile);
 		return ResponseEntity.ok().body(uploadStatus);
 	}
 

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Iterator;
 import java.util.stream.Stream;
 
 import org.apache.poi.hssf.usermodel.HSSFFont;
@@ -107,7 +108,7 @@ public class POIExcelReporter implements Reporter {
 		CellStyle style = workbook.createCellStyle();
 		style.setWrapText(true);
 		int index = 2;
-		for (var i = personStream.iterator(); i.hasNext(); index++) {
+		for (Iterator<Person> i = personStream.iterator(); i.hasNext(); index++) {
 			createSheetRow(sheet, style, i.next(), index);
 		}
 	}

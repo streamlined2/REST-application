@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import com.streamlined.restapp.RestApplication;
 import com.streamlined.restapp.dao.CountryRepository;
 import com.streamlined.restapp.data.Continent;
@@ -85,9 +87,9 @@ class CountryControllerTest {
 		MvcResult mvcResult = mvc.perform(get("/api/country"))
 				.andExpectAll(status().isOk(), content().contentType(MediaType.APPLICATION_JSON)).andReturn();
 
-		var content = mvcResult.getResponse().getContentAsString();
-		var collectionType = mapper.getTypeFactory().constructCollectionType(List.class, Country.class);
-		var value = mapper.readValue(content, collectionType);
+		String content = mvcResult.getResponse().getContentAsString();
+		CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(List.class, Country.class);
+		Object value = mapper.readValue(content, collectionType);
 
 		assertThat(value).isNotNull().asList().hasSize(COUNTRY_LIST.size())
 				.containsExactlyInAnyOrderElementsOf(COUNTRY_LIST);
@@ -100,8 +102,8 @@ class CountryControllerTest {
 
 		MvcResult mvcResult = mvc.perform(get("/api/country/{id}", COUNTRY_ID))
 				.andExpectAll(status().isOk(), content().contentType(MediaType.APPLICATION_JSON)).andReturn();
-		var content = mvcResult.getResponse().getContentAsString();
-		var value = mapper.readValue(content, Country.class);
+		String content = mvcResult.getResponse().getContentAsString();
+		Object value = mapper.readValue(content, Country.class);
 
 		assertThat(value).isNotNull().usingRecursiveComparison().isEqualTo(COUNTRY_LIST.get(COUNTRY_INDEX));
 	}
@@ -123,10 +125,10 @@ class CountryControllerTest {
 				.perform(post("/api/country").contentType(MediaType.APPLICATION_JSON).content(requestBody))
 				.andExpectAll(status().isCreated()).andReturn();
 
-		var locationHeader = mvcResult.getResponse().getHeader("Location");
+		String locationHeader = mvcResult.getResponse().getHeader("Location");
 		assertThat(locationHeader).matchesSatisfying(Pattern.compile("http://localhost/api/country/(\\d+)"),
 				matcher -> {
-					var entityId = Long.valueOf(matcher.group(1));
+					Long entityId = Long.valueOf(matcher.group(1));
 					newCountry.setId(entityId);
 					assertThat(countryRepository.findById(entityId)).contains(newCountry);
 				});
@@ -196,7 +198,7 @@ class CountryControllerTest {
 		mvc.perform(put("/api/country/{id}", COUNTRY_ID).contentType(MediaType.APPLICATION_JSON).content(requestBody))
 				.andExpectAll(status().isOk());
 
-		var updatedEntity = countryRepository.findById(COUNTRY_ID);
+		Optional<Country> updatedEntity = countryRepository.findById(COUNTRY_ID);
 		assertThat(updatedEntity).contains(newCountry);
 	}
 
@@ -275,7 +277,7 @@ class CountryControllerTest {
 
 		mvc.perform(delete("/api/country/{id}", COUNTRY_ID)).andExpect(status().isOk());
 
-		var deletedEntity = countryRepository.findById(COUNTRY_ID);
+		Optional<Country> deletedEntity = countryRepository.findById(COUNTRY_ID);
 		assertThat(deletedEntity).isEmpty();
 	}
 
@@ -285,7 +287,7 @@ class CountryControllerTest {
 
 		mvc.perform(delete("/api/country/{id}", NON_EXISTING_COUNTRY_ID)).andExpect(status().isOk());
 
-		var nonExistingEntity = countryRepository.findById(NON_EXISTING_COUNTRY_ID);
+		Optional<Country> nonExistingEntity = countryRepository.findById(NON_EXISTING_COUNTRY_ID);
 		assertThat(nonExistingEntity).isEmpty();
 	}
 

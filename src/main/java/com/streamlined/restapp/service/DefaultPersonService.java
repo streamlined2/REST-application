@@ -1,6 +1,7 @@
 package com.streamlined.restapp.service;
 
 import java.nio.file.Path;
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -56,7 +57,7 @@ public class DefaultPersonService implements PersonService {
 
 	@Override
 	public PersonDto save(Long id, PersonDto person) {
-		var entity = personMapper.toEntity(person);
+		Person entity = personMapper.toEntity(person);
 		entity.setId(id);
 		Utilities.checkIfValid(validator, entity, "person");
 		return personMapper.toDto(personRepository.save(entity));
@@ -75,7 +76,7 @@ public class DefaultPersonService implements PersonService {
 	@Override
 	public PersonListDto getPersonList(int pageNumber, int pageSize, Person personProbe) {
 		Example<Person> example = Example.of(personProbe, getPersonMatcher());
-		var pageable = PageRequest.of(pageNumber, pageSize);
+		PageRequest pageable = PageRequest.of(pageNumber, pageSize);
 		Page<Person> personList = personRepository.findAll(example, pageable);
 		return new PersonListDto(personList.map(personMapper::toListDto).toList(), personList.getTotalPages());
 	}
@@ -93,7 +94,7 @@ public class DefaultPersonService implements PersonService {
 
 	@Override
 	public ReportDto getFilteredPersonsAsFileResource(Person personProbe) {
-		var personStream = getFilteredPersonEntityStream(personProbe);
+		Stream<Person> personStream = getFilteredPersonEntityStream(personProbe);
 		return new ReportDto(reporter.getFileResource(personStream), reporter.getFileName(), reporter.getMediaType());
 	}
 
@@ -102,10 +103,10 @@ public class DefaultPersonService implements PersonService {
 		Path folder = null;
 		try {
 			folder = Utilities.copyToTemporaryFolder(multipartFile);
-			var personStream = personParser.stream(folder);
+			Stream<Person> personStream = personParser.stream(folder);
 			int succeededEntries = 0;
 			int failedEntries = 0;
-			for (var i = personStream.iterator(); i.hasNext();) {
+			for (Iterator<Person> i = personStream.iterator(); i.hasNext();) {
 				try {
 					personRepository.save(i.next());
 					succeededEntries++;

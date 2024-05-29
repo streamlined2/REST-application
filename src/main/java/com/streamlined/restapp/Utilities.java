@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -43,9 +44,9 @@ public class Utilities {
 	}
 
 	public void checkIfValid(Validator validator, Object entity, String entityType) {
-		var violations = validator.validate(entity);
+		Set<ConstraintViolation<Object>> violations = validator.validate(entity);
 		if (!violations.isEmpty()) {
-			var violationDescription = Utilities.getViolations(violations);
+			String violationDescription = Utilities.getViolations(violations);
 			log.error("Incorrect {} data: {}", entityType, violationDescription);
 			throw new IncorrectDataException("Incorrect %s data: %s".formatted(entityType, violationDescription));
 		}
@@ -61,8 +62,8 @@ public class Utilities {
 	}
 
 	public Path copyToTemporaryFolder(MultipartFile multipartFile) {
-		try (var inputStream = new BufferedInputStream(multipartFile.getInputStream(), BUFFER_SIZE)) {
-			var folder = Files.createTempDirectory(PERSON_SOURCE_DIRECTORY_PREFIX);
+		try (BufferedInputStream inputStream = new BufferedInputStream(multipartFile.getInputStream(), BUFFER_SIZE)) {
+			Path folder = Files.createTempDirectory(PERSON_SOURCE_DIRECTORY_PREFIX);
 			Path file = folder.resolve(PERSON_SOURCE_FILE_NAME);
 			Files.copy(inputStream, file, StandardCopyOption.REPLACE_EXISTING);
 			return folder;
@@ -74,9 +75,9 @@ public class Utilities {
 
 	public void cleanTemporaryFolder(Path folder) {
 		if (folder != null) {
-			try (var fileStream = Files.walk(folder)) {
-				for (var i = fileStream.iterator(); i.hasNext();) {
-					var path = i.next();
+			try (Stream<Path> fileStream = Files.walk(folder)) {
+				for (Iterator<Path> i = fileStream.iterator(); i.hasNext();) {
+					Path path = i.next();
 					if (!Files.isDirectory(path)) {
 						Files.delete(path);
 					}

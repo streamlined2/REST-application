@@ -44,7 +44,7 @@ public class CountryController {
 
 	@PostMapping
 	public ResponseEntity<Void> addCountry(@RequestBody CountryDto country, HttpServletRequest servletRequest) {
-		var savedCountry = countryService.save(country);
+		CountryDto savedCountry = countryService.save(country);
 		return ResponseEntity.created(Utilities.getResourceURI(servletRequest, savedCountry.id())).build();
 	}
 

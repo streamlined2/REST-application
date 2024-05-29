@@ -1,5 +1,6 @@
 package com.streamlined.restapp.generator;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -11,6 +12,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -126,7 +128,7 @@ public class PersonDataGenerator {
 	}
 
 	private void createDataForOneFile(Path resultFileDirectory, int numberOfPersons, int fileNumber) {
-		try (var writer = Files.newBufferedWriter(getResultFile(resultFileDirectory, fileNumber),
+		try (BufferedWriter writer = Files.newBufferedWriter(getResultFile(resultFileDirectory, fileNumber),
 				StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
 			List<Person> persons = new ArrayList<>(numberOfPersons);
 			for (int k = 0; k < numberOfPersons; k++) {
@@ -188,10 +190,10 @@ public class PersonDataGenerator {
 	}
 
 	private String getFavoriteMeals() {
-		var mealSet = new ArrayList<>(meals);
+		List<String> mealSet = new ArrayList<>(meals);
 		Collections.shuffle(mealSet, random);
 		int count = MIN_MEALS_COUNT + random.nextInt(meals.size() - MIN_MEALS_COUNT);
-		var mealIterator = mealSet.iterator();
+		Iterator<String> mealIterator = mealSet.iterator();
 		StringBuilder b = new StringBuilder();
 		if (count > 0) {
 			b.append(mealIterator.next());

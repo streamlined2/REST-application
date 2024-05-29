@@ -1,6 +1,8 @@
 package com.streamlined.restapp.parser;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
@@ -49,14 +51,16 @@ public class ParallelPersonParser implements PersonParser {
 	}
 
 	/**
-	 * Method reads data from file {@code path}, parses data and creates stream of person entities 
+	 * Method reads data from file {@code path}, parses data and creates stream of
+	 * person entities
+	 * 
 	 * @param path input file to be parsed
 	 * @return stream of person entities
 	 * @throws ParseException if input file cannot be found, read, parsed, or closed
 	 */
 	public Stream<Person> stream(Path path) {
-		var iterator = new StreamingIterator(path);
-		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator, 0), false).filter(Objects::nonNull);
+		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new StreamingIterator(path), 0), false)
+				.filter(Objects::nonNull);
 	}
 
 	private class StreamingIterator implements Iterator<Person> {
@@ -76,7 +80,7 @@ public class ParallelPersonParser implements PersonParser {
 		}
 
 		private void startParsing(Path dataPath) {
-			try (var pathStream = Files.newDirectoryStream(dataPath, SOURCE_FILE_PATTERN)) {
+			try (DirectoryStream<Path> pathStream = Files.newDirectoryStream(dataPath, SOURCE_FILE_PATTERN)) {
 				pathStream.forEach(sourceFileQueue::add);
 				performParseTasks();
 			} catch (IOException e) {
@@ -103,9 +107,9 @@ public class ParallelPersonParser implements PersonParser {
 		}
 
 		private void parseFile(Path filePath) {
-			try (var reader = Files.newBufferedReader(filePath)) {
+			try (BufferedReader reader = Files.newBufferedReader(filePath)) {
 				List<Person> entities = mapper.readValue(reader, collectionType);
-				for (var entity : entities) {
+				for (Person entity : entities) {
 					resultQueue.put(entity);
 				}
 			} catch (IOException | InterruptedException e) {

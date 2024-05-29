@@ -1,10 +1,12 @@
 package com.streamlined.restapp.reporter;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.format.DateTimeFormatter;
+import java.util.Iterator;
 import java.util.stream.Stream;
 
 import org.springframework.context.annotation.Primary;
@@ -33,10 +35,12 @@ public class CSVReporter implements Reporter {
 	private static final String FIELD_SEPARATOR = ";";
 
 	/**
-	 * Method accepts stream of person entities and saves data as temporary file in CSV format
+	 * Method accepts stream of person entities and saves data as temporary file in
+	 * CSV format
+	 * 
 	 * @param personStream stream of person entities
 	 * @return created file in CSV format
-	 * @throws ReportException if file cannot be created or filled in  
+	 * @throws ReportException if file cannot be created or filled in
 	 */
 	@Override
 	public FileSystemResource getFileResource(Stream<Person> personStream) {
@@ -51,10 +55,10 @@ public class CSVReporter implements Reporter {
 	}
 
 	private void fillInWorkbookFile(Path file, Stream<Person> personStream) throws IOException {
-		try (var writer = Files.newBufferedWriter(file, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING,
-				StandardOpenOption.CREATE)) {
+		try (BufferedWriter writer = Files.newBufferedWriter(file, StandardOpenOption.WRITE,
+				StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
 			StringBuilder builder = new StringBuilder();
-			for (var i = personStream.iterator(); i.hasNext();) {
+			for (Iterator<Person> i = personStream.iterator(); i.hasNext();) {
 				Person person = i.next();
 				builder.setLength(0);
 				builder.append(person.getName()).append(FIELD_SEPARATOR);

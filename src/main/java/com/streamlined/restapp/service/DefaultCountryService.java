@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.streamlined.restapp.Utilities;
 import com.streamlined.restapp.dao.CountryRepository;
+import com.streamlined.restapp.data.Country;
 import com.streamlined.restapp.dto.CountryDto;
 import com.streamlined.restapp.mapper.CountryMapper;
 
@@ -42,7 +43,7 @@ public class DefaultCountryService implements CountryService {
 
 	@Override
 	public CountryDto save(Long id, CountryDto country) {
-		var entity = countryMapper.toEntity(country);
+		Country entity = countryMapper.toEntity(country);
 		entity.setId(id);
 		Utilities.checkIfValid(validator, entity, "country");
 		return countryMapper.toDto(countryRepository.save(entity));

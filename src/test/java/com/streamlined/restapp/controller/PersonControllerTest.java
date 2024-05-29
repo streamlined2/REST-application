@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
@@ -30,6 +31,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import com.streamlined.restapp.RestApplication;
 import com.streamlined.restapp.dao.PersonRepository;
 import com.streamlined.restapp.data.Color;
@@ -79,9 +81,9 @@ class PersonControllerTest {
 		MvcResult mvcResult = mvc.perform(get("/api/person"))
 				.andExpectAll(status().isOk(), content().contentType(MediaType.APPLICATION_JSON)).andReturn();
 
-		var content = mvcResult.getResponse().getContentAsString();
-		var collectionType = mapper.getTypeFactory().constructCollectionType(List.class, Person.class);
-		var value = mapper.readValue(content, collectionType);
+		String content = mvcResult.getResponse().getContentAsString();
+		CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(List.class, Person.class);
+		Object value = mapper.readValue(content, collectionType);
 
 		assertThat(value).isNotNull().asList().usingRecursiveComparison().isEqualTo(personList);
 	}
@@ -99,8 +101,8 @@ class PersonControllerTest {
 
 		MvcResult mvcResult = mvc.perform(get("/api/person/{id}", newPerson.getId()))
 				.andExpectAll(status().isOk(), content().contentType(MediaType.APPLICATION_JSON)).andReturn();
-		var content = mvcResult.getResponse().getContentAsString();
-		var person = mapper.readValue(content, Person.class);
+		String content = mvcResult.getResponse().getContentAsString();
+		Person person = mapper.readValue(content, Person.class);
 
 		assertThat(person).isNotNull().usingRecursiveComparison().isEqualTo(newPerson);
 	}
@@ -122,15 +124,15 @@ class PersonControllerTest {
 				.eyeColor(Color.GREEN).hairColor(Color.BLACK).weight(BigDecimal.valueOf(80))
 				.height(BigDecimal.valueOf(190)).countryOfOrigin(newCountry).citizenship(newCountry)
 				.favoriteMeals("apple,pear,banana").build();
-		var requestBody = mapper.writeValueAsString(newPerson);
+		String requestBody = mapper.writeValueAsString(newPerson);
 
 		MvcResult mvcResult = mvc
 				.perform(post("/api/person").contentType(MediaType.APPLICATION_JSON).content(requestBody))
 				.andExpectAll(status().isCreated()).andReturn();
 
-		var locationHeader = mvcResult.getResponse().getHeader("Location");
+		String locationHeader = mvcResult.getResponse().getHeader("Location");
 		assertThat(locationHeader).matchesSatisfying(Pattern.compile("http://localhost/api/person/(\\d+)"), matcher -> {
-			var entityId = Long.valueOf(matcher.group(1));
+			Long entityId = Long.valueOf(matcher.group(1));
 			newPerson.setId(entityId);
 			assertThat(personRepository.findById(entityId)).contains(newPerson);
 		});
@@ -145,7 +147,7 @@ class PersonControllerTest {
 				.eyeColor(Color.GREEN).hairColor(Color.BLACK).weight(BigDecimal.valueOf(80))
 				.height(BigDecimal.valueOf(190)).countryOfOrigin(newCountry).citizenship(newCountry)
 				.favoriteMeals("apple,pear,banana").build();
-		var requestBody = mapper.writeValueAsString(newPerson);
+		String requestBody = mapper.writeValueAsString(newPerson);
 
 		mvc.perform(post("/api/person").contentType(MediaType.APPLICATION_JSON).content(requestBody))
 				.andExpectAll(status().isBadRequest());
@@ -160,7 +162,7 @@ class PersonControllerTest {
 				.eyeColor(Color.GREEN).hairColor(Color.BLACK).weight(BigDecimal.valueOf(80))
 				.height(BigDecimal.valueOf(190)).countryOfOrigin(newCountry).citizenship(newCountry)
 				.favoriteMeals("apple,pear,banana").build();
-		var requestBody = mapper.writeValueAsString(newPerson);
+		String requestBody = mapper.writeValueAsString(newPerson);
 
 		mvc.perform(post("/api/person").contentType(MediaType.APPLICATION_JSON).content(requestBody))
 				.andExpectAll(status().isBadRequest());
@@ -173,7 +175,7 @@ class PersonControllerTest {
 		Person newPerson = Person.builder().name("Nicholas Green").birthday(null).sex(Sex.MALE).eyeColor(Color.GREEN)
 				.hairColor(Color.BLACK).weight(BigDecimal.valueOf(80)).height(BigDecimal.valueOf(190))
 				.countryOfOrigin(newCountry).citizenship(newCountry).favoriteMeals("apple,pear,banana").build();
-		var requestBody = mapper.writeValueAsString(newPerson);
+		String requestBody = mapper.writeValueAsString(newPerson);
 
 		mvc.perform(post("/api/person").contentType(MediaType.APPLICATION_JSON).content(requestBody))
 				.andExpectAll(status().isBadRequest());
@@ -187,7 +189,7 @@ class PersonControllerTest {
 				.eyeColor(Color.GREEN).hairColor(Color.BLACK).weight(BigDecimal.valueOf(80))
 				.height(BigDecimal.valueOf(190)).countryOfOrigin(newCountry).citizenship(newCountry)
 				.favoriteMeals("apple,pear,banana").build();
-		var requestBody = mapper.writeValueAsString(newPerson);
+		String requestBody = mapper.writeValueAsString(newPerson);
 		personRepository.save(newPerson);
 
 		mvc.perform(post("/api/person").contentType(MediaType.APPLICATION_JSON).content(requestBody))
@@ -202,7 +204,7 @@ class PersonControllerTest {
 				.eyeColor(Color.GREEN).hairColor(Color.BLACK).weight(BigDecimal.valueOf(80))
 				.height(BigDecimal.valueOf(190)).countryOfOrigin(newCountry).citizenship(newCountry)
 				.favoriteMeals("apple,pear,banana").build();
-		var requestBody = mapper.writeValueAsString(newPerson);
+		String requestBody = mapper.writeValueAsString(newPerson);
 
 		mvc.perform(post("/api/person").contentType(MediaType.APPLICATION_JSON).content(requestBody))
 				.andExpectAll(status().isBadRequest());
@@ -215,7 +217,7 @@ class PersonControllerTest {
 		Person newPerson = Person.builder().name("Nicholas Green").birthday(LocalDate.of(2000, 1, 1)).sex(Sex.MALE)
 				.eyeColor(null).hairColor(Color.BLACK).weight(BigDecimal.valueOf(80)).height(BigDecimal.valueOf(190))
 				.countryOfOrigin(newCountry).citizenship(newCountry).favoriteMeals("apple,pear,banana").build();
-		var requestBody = mapper.writeValueAsString(newPerson);
+		String requestBody = mapper.writeValueAsString(newPerson);
 
 		mvc.perform(post("/api/person").contentType(MediaType.APPLICATION_JSON).content(requestBody))
 				.andExpectAll(status().isBadRequest());
@@ -228,7 +230,7 @@ class PersonControllerTest {
 		Person newPerson = Person.builder().name("Nicholas Green").birthday(LocalDate.of(2000, 1, 1)).sex(Sex.MALE)
 				.eyeColor(Color.GREEN).hairColor(null).weight(BigDecimal.valueOf(80)).height(BigDecimal.valueOf(190))
 				.countryOfOrigin(newCountry).citizenship(newCountry).favoriteMeals("apple,pear,banana").build();
-		var requestBody = mapper.writeValueAsString(newPerson);
+		String requestBody = mapper.writeValueAsString(newPerson);
 
 		mvc.perform(post("/api/person").contentType(MediaType.APPLICATION_JSON).content(requestBody))
 				.andExpectAll(status().isBadRequest());
@@ -242,7 +244,7 @@ class PersonControllerTest {
 				.eyeColor(Color.GREEN).hairColor(Color.BLACK).weight(BigDecimal.valueOf(80))
 				.height(BigDecimal.valueOf(190)).countryOfOrigin(null).citizenship(newCountry)
 				.favoriteMeals("apple,pear,banana").build();
-		var requestBody = mapper.writeValueAsString(newPerson);
+		String requestBody = mapper.writeValueAsString(newPerson);
 
 		mvc.perform(post("/api/person").contentType(MediaType.APPLICATION_JSON).content(requestBody))
 				.andExpectAll(status().isBadRequest());
@@ -256,7 +258,7 @@ class PersonControllerTest {
 				.eyeColor(Color.GREEN).hairColor(Color.BLACK).weight(BigDecimal.valueOf(80))
 				.height(BigDecimal.valueOf(190)).countryOfOrigin(newCountry).citizenship(null)
 				.favoriteMeals("apple,pear,banana").build();
-		var requestBody = mapper.writeValueAsString(newPerson);
+		String requestBody = mapper.writeValueAsString(newPerson);
 
 		mvc.perform(post("/api/person").contentType(MediaType.APPLICATION_JSON).content(requestBody))
 				.andExpectAll(status().isBadRequest());
@@ -271,7 +273,7 @@ class PersonControllerTest {
 				.eyeColor(Color.GREEN).hairColor(Color.BLACK).weight(BigDecimal.valueOf(weight))
 				.height(BigDecimal.valueOf(190)).countryOfOrigin(newCountry).citizenship(newCountry)
 				.favoriteMeals("apple,pear,banana").build();
-		var requestBody = mapper.writeValueAsString(newPerson);
+		String requestBody = mapper.writeValueAsString(newPerson);
 
 		mvc.perform(post("/api/person").contentType(MediaType.APPLICATION_JSON).content(requestBody))
 				.andExpectAll(status().isBadRequest());
@@ -286,7 +288,7 @@ class PersonControllerTest {
 				.eyeColor(Color.GREEN).hairColor(Color.BLACK).weight(BigDecimal.valueOf(80))
 				.height(BigDecimal.valueOf(height)).countryOfOrigin(newCountry).citizenship(newCountry)
 				.favoriteMeals("apple,pear,banana").build();
-		var requestBody = mapper.writeValueAsString(newPerson);
+		String requestBody = mapper.writeValueAsString(newPerson);
 
 		mvc.perform(post("/api/person").contentType(MediaType.APPLICATION_JSON).content(requestBody))
 				.andExpectAll(status().isBadRequest());
@@ -301,7 +303,7 @@ class PersonControllerTest {
 				.eyeColor(Color.GREEN).hairColor(Color.BLACK).weight(BigDecimal.valueOf(80))
 				.height(BigDecimal.valueOf(180)).countryOfOrigin(newCountry).citizenship(newCountry)
 				.favoriteMeals(favoriteMeals).build();
-		var requestBody = mapper.writeValueAsString(newPerson);
+		String requestBody = mapper.writeValueAsString(newPerson);
 
 		mvc.perform(post("/api/person").contentType(MediaType.APPLICATION_JSON).content(requestBody))
 				.andExpectAll(status().isBadRequest());
@@ -324,11 +326,11 @@ class PersonControllerTest {
 		final Long PERSON_ID = newPerson.getId();
 		updatedPerson.setId(PERSON_ID);
 
-		var requestBody = mapper.writeValueAsString(updatedPerson);
+		String requestBody = mapper.writeValueAsString(updatedPerson);
 		mvc.perform(put("/api/person/{id}", PERSON_ID).contentType(MediaType.APPLICATION_JSON).content(requestBody))
 				.andExpectAll(status().isOk());
 
-		var fetchedPerson = personRepository.findById(PERSON_ID);
+		Optional<Person> fetchedPerson = personRepository.findById(PERSON_ID);
 		assertThat(fetchedPerson).contains(updatedPerson);
 	}
 
@@ -346,7 +348,7 @@ class PersonControllerTest {
 
 		mvc.perform(delete("/api/person/{id}", PERSON_ID)).andExpect(status().isOk());
 
-		var deletedEntity = personRepository.findById(PERSON_ID);
+		Optional<Person> deletedEntity = personRepository.findById(PERSON_ID);
 		assertThat(deletedEntity).isEmpty();
 	}
 
@@ -357,7 +359,7 @@ class PersonControllerTest {
 
 		mvc.perform(delete("/api/person/{id}", NON_EXISTING_PERSON_ID)).andExpect(status().isOk());
 
-		var nonExistingEntity = personRepository.findById(NON_EXISTING_PERSON_ID);
+		Optional<Person> nonExistingEntity = personRepository.findById(NON_EXISTING_PERSON_ID);
 		assertThat(nonExistingEntity).isEmpty();
 	}
 
@@ -374,7 +376,7 @@ class PersonControllerTest {
 
 		mvc.perform(delete("/api/person")).andExpect(status().isOk());
 
-		var existingEntitiesCount = personRepository.count();
+		long existingEntitiesCount = personRepository.count();
 		assertThat(existingEntitiesCount).isZero();
 	}
 
@@ -415,7 +417,7 @@ class PersonControllerTest {
 		personRepository.deleteAll();
 		personRepository.saveAll(personList);
 
-		var requestBody = """
+		String requestBody = """
 				{
 				        "sex":"FEMALE",
 				        "eyeColor":"RED",
@@ -428,8 +430,8 @@ class PersonControllerTest {
 				.perform(post("/api/person/_list").contentType(MediaType.APPLICATION_JSON).content(requestBody))
 				.andExpectAll(status().isOk(), content().contentType(MediaType.APPLICATION_JSON)).andReturn();
 
-		var content = mvcResult.getResponse().getContentAsString();
-		var response = mapper.readValue(content, PersonListDto.class);
+		String content = mvcResult.getResponse().getContentAsString();
+		PersonListDto response = mapper.readValue(content, PersonListDto.class);
 
 		assertThat(response).isNotNull();
 		assertThat(response.totalPages()).isEqualTo(2);
@@ -478,7 +480,7 @@ class PersonControllerTest {
 		personRepository.deleteAll();
 		personRepository.saveAll(personList);
 
-		var requestBody = """
+		String requestBody = """
 				{
 				           "countryOfOrigin":{
 				               "name": "USA"
@@ -494,8 +496,8 @@ class PersonControllerTest {
 				.perform(post("/api/person/_list").contentType(MediaType.APPLICATION_JSON).content(requestBody))
 				.andExpectAll(status().isOk(), content().contentType(MediaType.APPLICATION_JSON)).andReturn();
 
-		var content = mvcResult.getResponse().getContentAsString();
-		var response = mapper.readValue(content, PersonListDto.class);
+		String content = mvcResult.getResponse().getContentAsString();
+		PersonListDto response = mapper.readValue(content, PersonListDto.class);
 
 		assertThat(response).isNotNull();
 		assertThat(response.totalPages()).isEqualTo(1);
@@ -544,7 +546,7 @@ class PersonControllerTest {
 		personRepository.deleteAll();
 		personRepository.saveAll(personList);
 
-		var requestBody = """
+		String requestBody = """
 				{
 				           "countryOfOrigin":{
 				           		"id":1
@@ -557,8 +559,8 @@ class PersonControllerTest {
 				.perform(post("/api/person/_list").contentType(MediaType.APPLICATION_JSON).content(requestBody))
 				.andExpectAll(status().isOk(), content().contentType(MediaType.APPLICATION_JSON)).andReturn();
 
-		var content = mvcResult.getResponse().getContentAsString();
-		var response = mapper.readValue(content, PersonListDto.class);
+		String content = mvcResult.getResponse().getContentAsString();
+		PersonListDto response = mapper.readValue(content, PersonListDto.class);
 
 		assertThat(response).isNotNull();
 		assertThat(response.totalPages()).isEqualTo(1);
@@ -600,22 +602,22 @@ class PersonControllerTest {
 		personRepository.deleteAll();
 		personRepository.saveAll(personList);
 
-		var requestBody = """
+		String requestBody = """
 				{
 				       "sex":"FEMALE",
 				       "eyeColor":"RED",
 				       "hairColor":"YELLOW"
 				}
 				""";
-		var reply = "Ruth Glanshow;2000-01-01;FEMALE;RED;120" + LINE_SEPARATOR + "Becky Steep;2000-01-01;FEMALE;RED;120"
+		String reply = "Ruth Glanshow;2000-01-01;FEMALE;RED;120" + LINE_SEPARATOR + "Becky Steep;2000-01-01;FEMALE;RED;120"
 				+ LINE_SEPARATOR;
 		MvcResult mvcResult = mvc
 				.perform(post("/api/person/_report").contentType(MediaType.APPLICATION_JSON).content(requestBody))
 				.andExpectAll(status().isOk()).andReturn();
 
-		var contentDispositionHeader = mvcResult.getResponse().getHeader(HttpHeaders.CONTENT_DISPOSITION);
-		var contentType = mvcResult.getResponse().getContentType();
-		var content = mvcResult.getResponse().getContentAsByteArray();
+		String contentDispositionHeader = mvcResult.getResponse().getHeader(HttpHeaders.CONTENT_DISPOSITION);
+		String contentType = mvcResult.getResponse().getContentType();
+		byte[] content = mvcResult.getResponse().getContentAsByteArray();
 
 		assertThat(contentDispositionHeader).matches("attachment; filename=\"\\w+.csv\"");
 		assertThat(contentType).isEqualTo("text/csv");
@@ -639,7 +641,7 @@ class PersonControllerTest {
 						.eyeColor(Color.RED).hairColor(Color.YELLOW).weight(BigDecimal.valueOf(50))
 						.height(BigDecimal.valueOf(120)).countryOfOrigin(usa).citizenship(usa)
 						.favoriteMeals("pear,apple,banana").build());
-		var multipartFileContent = mapper.writeValueAsBytes(personList);
+		byte[] multipartFileContent = mapper.writeValueAsBytes(personList);
 
 		personRepository.deleteAll();
 
@@ -647,7 +649,7 @@ class PersonControllerTest {
 		MvcResult mvcResult = mvc.perform(multipart("/api/person/upload").file(multipartFile))
 				.andExpectAll(status().isOk()).andReturn();
 
-		var response = mapper.readValue(mvcResult.getResponse().getContentAsString(), UploadResponse.class);
+		UploadResponse response = mapper.readValue(mvcResult.getResponse().getContentAsString(), UploadResponse.class);
 		assertThat(response.succeededEntries()).isEqualTo(personList.size());
 		assertThat(response.failedEntries()).isZero();
 
