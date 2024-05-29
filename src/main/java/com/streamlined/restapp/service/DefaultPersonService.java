@@ -10,6 +10,7 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.streamlined.restapp.Utilities;
@@ -32,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class DefaultPersonService implements PersonService {
 
 	private final PersonRepository personRepository;
@@ -51,11 +53,16 @@ public class DefaultPersonService implements PersonService {
 	}
 
 	@Override
+	@Transactional
 	public PersonDto save(PersonDto person) {
-		return save(person.id(), person);
+		Person entity = personMapper.toEntity(person);
+		entity.setId(person.id());
+		Utilities.checkIfValid(validator, entity, "person");
+		return personMapper.toDto(personRepository.save(entity));
 	}
 
 	@Override
+	@Transactional
 	public PersonDto save(Long id, PersonDto person) {
 		Person entity = personMapper.toEntity(person);
 		entity.setId(id);
@@ -64,11 +71,13 @@ public class DefaultPersonService implements PersonService {
 	}
 
 	@Override
+	@Transactional
 	public void removeById(Long id) {
 		personRepository.deleteById(id);
 	}
 
 	@Override
+	@Transactional
 	public void removeAllPersons() {
 		personRepository.deleteAll();
 	}
@@ -99,6 +108,7 @@ public class DefaultPersonService implements PersonService {
 	}
 
 	@Override
+	@Transactional
 	public UploadResponse uploadFile(MultipartFile multipartFile) {
 		Path folder = null;
 		try {

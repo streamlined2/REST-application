@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.streamlined.restapp.Utilities;
 import com.streamlined.restapp.dao.CountryRepository;
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class DefaultCountryService implements CountryService {
 
 	private final CountryRepository countryRepository;
@@ -37,11 +39,16 @@ public class DefaultCountryService implements CountryService {
 	}
 
 	@Override
+	@Transactional
 	public CountryDto save(CountryDto country) {
-		return save(country.id(), country);
+		Country entity = countryMapper.toEntity(country);
+		entity.setId(country.id());
+		Utilities.checkIfValid(validator, entity, "country");
+		return countryMapper.toDto(countryRepository.save(entity));
 	}
 
 	@Override
+	@Transactional
 	public CountryDto save(Long id, CountryDto country) {
 		Country entity = countryMapper.toEntity(country);
 		entity.setId(id);
@@ -50,6 +57,7 @@ public class DefaultCountryService implements CountryService {
 	}
 
 	@Override
+	@Transactional
 	public void removeById(Long id) {
 		countryRepository.deleteById(id);
 	}
