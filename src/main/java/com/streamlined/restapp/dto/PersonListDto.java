@@ -1,4 +1,4 @@
-package com.streamlined.restapp.model;
+package com.streamlined.restapp.dto;
 
 import java.util.List;
 

@@ -1,6 +1,9 @@
-package com.streamlined.restapp.model;
+package com.streamlined.restapp.mapper;
 
 import org.springframework.stereotype.Component;
+
+import com.streamlined.restapp.data.Country;
+import com.streamlined.restapp.dto.CountryDto;
 
 @Component
 public class CountryMapper {

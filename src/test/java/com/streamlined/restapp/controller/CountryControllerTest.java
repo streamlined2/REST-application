@@ -26,8 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.streamlined.restapp.RestApplication;
 import com.streamlined.restapp.dao.CountryRepository;
-import com.streamlined.restapp.model.Continent;
-import com.streamlined.restapp.model.Country;
+import com.streamlined.restapp.data.Continent;
+import com.streamlined.restapp.data.Country;
 
 @SpringBootTest(webEnvironment = WebEnvironment.MOCK, classes = RestApplication.class)
 @AutoConfigureMockMvc

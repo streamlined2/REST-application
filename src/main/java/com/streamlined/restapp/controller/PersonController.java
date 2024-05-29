@@ -17,9 +17,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.streamlined.restapp.Utilities;
+import com.streamlined.restapp.dto.PersonDto;
+import com.streamlined.restapp.dto.PersonListDto;
+import com.streamlined.restapp.dto.PersonListRequest;
+import com.streamlined.restapp.dto.UploadResponse;
 import com.streamlined.restapp.exception.EntityNotFoundException;
-import com.streamlined.restapp.model.PersonDto;
-import com.streamlined.restapp.model.PersonListDto;
 import com.streamlined.restapp.service.PersonService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -50,7 +53,7 @@ public class PersonController {
 	@PostMapping
 	public ResponseEntity<Void> addPerson(@RequestBody PersonDto person, HttpServletRequest servletRequest) {
 		var savedPerson = personService.save(person);
-		return ResponseEntity.created(ControllerUtilities.getResourceURI(servletRequest, savedPerson.id())).build();
+		return ResponseEntity.created(Utilities.getResourceURI(servletRequest, savedPerson.id())).build();
 	}
 
 	@PutMapping("/{id}")

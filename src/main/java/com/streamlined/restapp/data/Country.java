@@ -1,4 +1,4 @@
-package com.streamlined.restapp.model;
+package com.streamlined.restapp.data;
 
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.validator.constraints.Length;

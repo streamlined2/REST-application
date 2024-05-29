@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.streamlined.restapp.Utilities;
 import com.streamlined.restapp.dao.CountryRepository;
-import com.streamlined.restapp.model.CountryDto;
-import com.streamlined.restapp.model.CountryMapper;
+import com.streamlined.restapp.dto.CountryDto;
+import com.streamlined.restapp.mapper.CountryMapper;
 
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +44,7 @@ public class DefaultCountryService implements CountryService {
 	public CountryDto save(Long id, CountryDto country) {
 		var entity = countryMapper.toEntity(country);
 		entity.setId(id);
-		ServiceUtilities.checkIfValid(validator, entity, "country");
+		Utilities.checkIfValid(validator, entity, "country");
 		return countryMapper.toDto(countryRepository.save(entity));
 	}
 

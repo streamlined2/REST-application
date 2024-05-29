@@ -1,6 +1,8 @@
-package com.streamlined.restapp.model;
+package com.streamlined.restapp.dto;
 
 import java.util.Objects;
+
+import com.streamlined.restapp.data.Continent;
 
 import lombok.Builder;
 

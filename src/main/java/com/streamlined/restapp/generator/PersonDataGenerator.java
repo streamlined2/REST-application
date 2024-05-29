@@ -15,11 +15,12 @@ import java.util.List;
 import java.util.Random;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.streamlined.restapp.model.Color;
-import com.streamlined.restapp.model.Continent;
-import com.streamlined.restapp.model.Country;
-import com.streamlined.restapp.model.Person;
-import com.streamlined.restapp.model.Sex;
+import com.streamlined.restapp.data.Color;
+import com.streamlined.restapp.data.Continent;
+import com.streamlined.restapp.data.Country;
+import com.streamlined.restapp.data.Person;
+import com.streamlined.restapp.data.Sex;
+import com.streamlined.restapp.exception.GeneratorException;
 
 import lombok.extern.slf4j.Slf4j;
 

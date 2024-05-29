@@ -1,4 +1,4 @@
-package com.streamlined.restapp.model;
+package com.streamlined.restapp.dto;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;

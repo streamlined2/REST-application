@@ -1,4 +1,4 @@
-package com.streamlined.restapp.generator;
+package com.streamlined.restapp.exception;
 
 import lombok.experimental.StandardException;
 

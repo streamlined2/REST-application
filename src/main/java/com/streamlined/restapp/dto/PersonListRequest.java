@@ -1,12 +1,12 @@
-package com.streamlined.restapp.controller;
+package com.streamlined.restapp.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.streamlined.restapp.model.Color;
-import com.streamlined.restapp.model.Country;
-import com.streamlined.restapp.model.Person;
-import com.streamlined.restapp.model.Sex;
+import com.streamlined.restapp.data.Color;
+import com.streamlined.restapp.data.Country;
+import com.streamlined.restapp.data.Person;
+import com.streamlined.restapp.data.Sex;
 
 public record PersonListRequest(Integer page, Integer size, String name, LocalDate birthday, Sex sex, Color eyeColor,
 		Color hairColor, BigDecimal weight, BigDecimal height, Country countryOfOrigin, Country citizenship,

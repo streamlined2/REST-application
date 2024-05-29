@@ -3,7 +3,7 @@ package com.streamlined.restapp.service;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import com.streamlined.restapp.model.CountryDto;
+import com.streamlined.restapp.dto.CountryDto;
 
 public interface CountryService {
 

@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.streamlined.restapp.Utilities;
+import com.streamlined.restapp.dto.CountryDto;
 import com.streamlined.restapp.exception.EntityNotFoundException;
-import com.streamlined.restapp.model.CountryDto;
 import com.streamlined.restapp.service.CountryService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,7 +45,7 @@ public class CountryController {
 	@PostMapping
 	public ResponseEntity<Void> addCountry(@RequestBody CountryDto country, HttpServletRequest servletRequest) {
 		var savedCountry = countryService.save(country);
-		return ResponseEntity.created(ControllerUtilities.getResourceURI(servletRequest, savedCountry.id())).build();
+		return ResponseEntity.created(Utilities.getResourceURI(servletRequest, savedCountry.id())).build();
 	}
 
 	@PutMapping("/{id}")

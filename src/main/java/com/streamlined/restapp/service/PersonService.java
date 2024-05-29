@@ -5,12 +5,11 @@ import java.util.stream.Stream;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.streamlined.restapp.controller.UploadResponse;
-import com.streamlined.restapp.model.EssentialPersonDto;
-import com.streamlined.restapp.model.Person;
-import com.streamlined.restapp.model.PersonDto;
-import com.streamlined.restapp.model.PersonListDto;
-import com.streamlined.restapp.model.ReportDto;
+import com.streamlined.restapp.data.Person;
+import com.streamlined.restapp.dto.PersonDto;
+import com.streamlined.restapp.dto.PersonListDto;
+import com.streamlined.restapp.dto.ReportDto;
+import com.streamlined.restapp.dto.UploadResponse;
 
 public interface PersonService {
 
@@ -25,8 +24,6 @@ public interface PersonService {
 	void removeById(Long id);
 
 	void removeAllPersons();
-
-	Stream<EssentialPersonDto> getFilteredPersonStream(Person probe);
 
 	ReportDto getFilteredPersonsAsFileResource(Person personPerson);
 

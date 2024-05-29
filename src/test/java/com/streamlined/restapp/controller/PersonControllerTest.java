@@ -32,13 +32,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.streamlined.restapp.RestApplication;
 import com.streamlined.restapp.dao.PersonRepository;
-import com.streamlined.restapp.model.Color;
-import com.streamlined.restapp.model.Continent;
-import com.streamlined.restapp.model.Country;
-import com.streamlined.restapp.model.EssentialPersonDto;
-import com.streamlined.restapp.model.Person;
-import com.streamlined.restapp.model.PersonListDto;
-import com.streamlined.restapp.model.Sex;
+import com.streamlined.restapp.data.Color;
+import com.streamlined.restapp.data.Continent;
+import com.streamlined.restapp.data.Country;
+import com.streamlined.restapp.data.Person;
+import com.streamlined.restapp.data.Sex;
+import com.streamlined.restapp.dto.EssentialPersonDto;
+import com.streamlined.restapp.dto.PersonListDto;
+import com.streamlined.restapp.dto.UploadResponse;
 
 @SpringBootTest(webEnvironment = WebEnvironment.MOCK, classes = RestApplication.class)
 @AutoConfigureMockMvc

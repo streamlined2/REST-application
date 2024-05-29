@@ -1,8 +1,11 @@
-package com.streamlined.restapp.model;
+package com.streamlined.restapp.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
+
+import com.streamlined.restapp.data.Color;
+import com.streamlined.restapp.data.Sex;
 
 import lombok.Builder;
 

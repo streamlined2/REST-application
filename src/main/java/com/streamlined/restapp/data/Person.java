@@ -1,4 +1,4 @@
-package com.streamlined.restapp.model;
+package com.streamlined.restapp.data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

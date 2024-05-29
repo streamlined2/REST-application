@@ -21,8 +21,8 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.streamlined.restapp.data.Person;
 import com.streamlined.restapp.exception.ParseException;
-import com.streamlined.restapp.model.Person;
 
 import lombok.extern.slf4j.Slf4j;
 

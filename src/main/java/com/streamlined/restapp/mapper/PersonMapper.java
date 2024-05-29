@@ -1,6 +1,10 @@
-package com.streamlined.restapp.model;
+package com.streamlined.restapp.mapper;
 
 import org.springframework.stereotype.Component;
+
+import com.streamlined.restapp.data.Person;
+import com.streamlined.restapp.dto.EssentialPersonDto;
+import com.streamlined.restapp.dto.PersonDto;
 
 import lombok.RequiredArgsConstructor;
 

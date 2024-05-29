@@ -12,14 +12,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.streamlined.restapp.Utilities;
-import com.streamlined.restapp.controller.UploadResponse;
 import com.streamlined.restapp.dao.PersonRepository;
-import com.streamlined.restapp.model.EssentialPersonDto;
-import com.streamlined.restapp.model.Person;
-import com.streamlined.restapp.model.PersonDto;
-import com.streamlined.restapp.model.PersonListDto;
-import com.streamlined.restapp.model.PersonMapper;
-import com.streamlined.restapp.model.ReportDto;
+import com.streamlined.restapp.data.Person;
+import com.streamlined.restapp.dto.PersonDto;
+import com.streamlined.restapp.dto.PersonListDto;
+import com.streamlined.restapp.dto.ReportDto;
+import com.streamlined.restapp.dto.UploadResponse;
+import com.streamlined.restapp.mapper.PersonMapper;
 import com.streamlined.restapp.parser.PersonParser;
 import com.streamlined.restapp.reporter.Reporter;
 
@@ -59,7 +58,7 @@ public class DefaultPersonService implements PersonService {
 	public PersonDto save(Long id, PersonDto person) {
 		var entity = personMapper.toEntity(person);
 		entity.setId(id);
-		ServiceUtilities.checkIfValid(validator, entity, "person");
+		Utilities.checkIfValid(validator, entity, "person");
 		return personMapper.toDto(personRepository.save(entity));
 	}
 
@@ -87,11 +86,6 @@ public class DefaultPersonService implements PersonService {
 				.withIgnoreNullValues();
 	}
 
-	@Override
-	public Stream<EssentialPersonDto> getFilteredPersonStream(Person personProbe) {
-		return getFilteredPersonEntityStream(personProbe).map(personMapper::toListDto);
-	}
-
 	private Stream<Person> getFilteredPersonEntityStream(Person personProbe) {
 		Example<Person> example = Example.of(personProbe);
 		return personRepository.findAll(example).stream();
@@ -107,7 +101,7 @@ public class DefaultPersonService implements PersonService {
 	public UploadResponse uploadFile(MultipartFile multipartFile) {
 		Path folder = null;
 		try {
-			folder = ServiceUtilities.copyToTemporaryFolder(multipartFile);
+			folder = Utilities.copyToTemporaryFolder(multipartFile);
 			var personStream = personParser.stream(folder);
 			int succeededEntries = 0;
 			int failedEntries = 0;
@@ -121,7 +115,7 @@ public class DefaultPersonService implements PersonService {
 			}
 			return new UploadResponse(succeededEntries, failedEntries);
 		} finally {
-			ServiceUtilities.cleanTemporaryFolder(folder);
+			Utilities.cleanTemporaryFolder(folder);
 		}
 	}
 

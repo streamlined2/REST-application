@@ -20,8 +20,8 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
+import com.streamlined.restapp.data.Person;
 import com.streamlined.restapp.exception.ReportException;
-import com.streamlined.restapp.model.Person;
 
 import lombok.extern.slf4j.Slf4j;
 
