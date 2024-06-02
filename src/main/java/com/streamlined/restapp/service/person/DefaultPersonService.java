@@ -1,4 +1,4 @@
-package com.streamlined.restapp.service;
+package com.streamlined.restapp.service.person;
 
 import java.nio.file.Path;
 import java.util.Iterator;
@@ -20,9 +20,10 @@ import com.streamlined.restapp.dto.PersonDto;
 import com.streamlined.restapp.dto.PersonListDto;
 import com.streamlined.restapp.dto.ReportDto;
 import com.streamlined.restapp.dto.UploadResponse;
-import com.streamlined.restapp.mapper.PersonMapper;
-import com.streamlined.restapp.parser.PersonParser;
-import com.streamlined.restapp.reporter.Reporter;
+import com.streamlined.restapp.dto.mapper.PersonMapper;
+import com.streamlined.restapp.service.notification.NotificationService;
+import com.streamlined.restapp.service.parser.PersonParser;
+import com.streamlined.restapp.service.reporter.Reporter;
 
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +42,7 @@ public class DefaultPersonService implements PersonService {
 	private final Validator validator;
 	private final Reporter reporter;
 	private final PersonParser personParser;
+	private final NotificationService notificationService;
 
 	@Override
 	public Stream<PersonDto> getAllPersons() {
@@ -58,7 +60,9 @@ public class DefaultPersonService implements PersonService {
 		Person entity = personMapper.toEntity(person);
 		entity.setId(person.id());
 		Utilities.checkIfValid(validator, entity, "person");
-		return personMapper.toDto(personRepository.save(entity));
+		PersonDto dto = personMapper.toDto(personRepository.save(entity));
+		notificationService.notify("person", dto, "saved");
+		return dto;
 	}
 
 	@Override
@@ -67,19 +71,23 @@ public class DefaultPersonService implements PersonService {
 		Person entity = personMapper.toEntity(person);
 		entity.setId(id);
 		Utilities.checkIfValid(validator, entity, "person");
-		return personMapper.toDto(personRepository.save(entity));
+		PersonDto dto = personMapper.toDto(personRepository.save(entity));
+		notificationService.notify("person", dto, "saved");
+		return dto;
 	}
 
 	@Override
 	@Transactional
 	public void removeById(Long id) {
 		personRepository.deleteById(id);
+		notificationService.notify("person", id, "removed");
 	}
 
 	@Override
 	@Transactional
 	public void removeAllPersons() {
 		personRepository.deleteAll();
+		notificationService.notify("all persons", "removed");
 	}
 
 	@Override
@@ -124,7 +132,9 @@ public class DefaultPersonService implements PersonService {
 					failedEntries++;
 				}
 			}
-			return new UploadResponse(succeededEntries, failedEntries);
+			UploadResponse uploadResponse = new UploadResponse(succeededEntries, failedEntries);
+			notificationService.notify("%d persons".formatted(succeededEntries), "uploaded");
+			return uploadResponse;
 		} finally {
 			Utilities.cleanTemporaryFolder(folder);
 		}

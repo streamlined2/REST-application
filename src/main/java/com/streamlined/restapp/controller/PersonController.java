@@ -24,7 +24,7 @@ import com.streamlined.restapp.dto.PersonListRequest;
 import com.streamlined.restapp.dto.ReportDto;
 import com.streamlined.restapp.dto.UploadResponse;
 import com.streamlined.restapp.exception.EntityNotFoundException;
-import com.streamlined.restapp.service.PersonService;
+import com.streamlined.restapp.service.person.PersonService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

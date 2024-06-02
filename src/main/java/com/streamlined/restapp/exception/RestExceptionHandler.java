@@ -39,9 +39,19 @@ public class RestExceptionHandler {
 		return ResponseEntity.badRequest().body(exception.getMessage());
 	}
 
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<String> handleAnyOtherExceptionByDefault(Exception exception) {
+	@ExceptionHandler(CantSendKafkaMessageException.class)
+	public ResponseEntity<String> handleImpossibleToSendKafkaMessage(CantSendKafkaMessageException exception) {
 		return ResponseEntity.badRequest().body(exception.getMessage());
 	}
 
+	@ExceptionHandler(KafkaMessageSerializationException.class)
+	public ResponseEntity<String> handleImpossibleToSerializeKafkaMessage(KafkaMessageSerializationException exception) {
+		return ResponseEntity.badRequest().body(exception.getMessage());
+	}
+
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<String> handleAnyOtherExceptionByDefault(Exception exception) {
+		return ResponseEntity.badRequest().body(exception.getMessage());
+	}	
+		
 }

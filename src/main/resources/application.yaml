@@ -1,3 +1,10 @@
+notification:
+  topic-name: notification
+  number-of-partitions: 1
+  replication-factor: 1
+  sender: { name: "Administrator", email: admin@company.com }
+  recipients: [{ name: "Serhii Pylypenko", email: serhii.pylypenko.0@gmail.com }]
+
 spring:
   application:
     name: REST-application
@@ -7,13 +14,16 @@ spring:
     username: postgres
     password: secret
   liquibase:
-    change-log: db/changelog.xml
+    driver-class-name: org.postgresql.Driver
+    change-log: classpath:db/changelog.xml
   jpa:
     show-sql: true
     properties:
       hibernate:
         format_sql: true
-
+  kafka:
+    bootstrap-servers: localhost:9094
+    
 server:
   port: 8080
   error:

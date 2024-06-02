@@ -1,4 +1,4 @@
-package com.streamlined.restapp.service;
+package com.streamlined.restapp.service.country;
 
 import java.util.Optional;
 import java.util.stream.Stream;

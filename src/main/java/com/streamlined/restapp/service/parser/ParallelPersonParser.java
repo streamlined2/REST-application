@@ -1,4 +1,4 @@
-package com.streamlined.restapp.parser;
+package com.streamlined.restapp.service.parser;
 
 import java.io.BufferedReader;
 import java.io.IOException;

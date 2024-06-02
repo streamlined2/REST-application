@@ -1,4 +1,4 @@
-package com.streamlined.restapp.reporter;
+package com.streamlined.restapp.service.reporter;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

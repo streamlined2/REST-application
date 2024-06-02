@@ -1,4 +1,4 @@
-package com.streamlined.restapp.reporter;
+package com.streamlined.restapp.service.reporter;
 
 import java.util.stream.Stream;
 

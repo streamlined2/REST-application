@@ -32,7 +32,7 @@ import com.streamlined.restapp.dao.CountryRepository;
 import com.streamlined.restapp.data.Continent;
 import com.streamlined.restapp.data.Country;
 import com.streamlined.restapp.dto.CountryDto;
-import com.streamlined.restapp.mapper.CountryMapper;
+import com.streamlined.restapp.dto.mapper.CountryMapper;
 
 @SpringBootTest(webEnvironment = WebEnvironment.MOCK, classes = RestApplication.class)
 @AutoConfigureMockMvc

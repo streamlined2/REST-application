@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.streamlined.restapp.Utilities;
 import com.streamlined.restapp.dto.CountryDto;
 import com.streamlined.restapp.exception.EntityNotFoundException;
-import com.streamlined.restapp.service.CountryService;
+import com.streamlined.restapp.service.country.CountryService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

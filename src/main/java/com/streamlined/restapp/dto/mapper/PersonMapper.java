@@ -1,4 +1,4 @@
-package com.streamlined.restapp.mapper;
+package com.streamlined.restapp.dto.mapper;
 
 import org.springframework.stereotype.Component;
 
