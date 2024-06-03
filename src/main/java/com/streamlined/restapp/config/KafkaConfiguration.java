@@ -1,4 +1,4 @@
-package com.streamlined.restapp;
+package com.streamlined.restapp.config;
 
 import java.util.Map;
 

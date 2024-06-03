@@ -8,6 +8,9 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import com.streamlined.restapp.config.RecipientsConfigurer;
+import com.streamlined.restapp.config.SenderConfigurer;
+
 /**
  * Main class of the application
  */

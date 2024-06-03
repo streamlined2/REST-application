@@ -1,4 +1,6 @@
-package com.streamlined.restapp;
+package com.streamlined.restapp.config;
+
+import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -10,14 +12,14 @@ import lombok.Setter;
 
 @Configuration
 @ConfigurationProperties(prefix = "notification")
-public class SenderConfigurer {
-	
+public class RecipientsConfigurer {
+
 	@Setter
-	private Contact sender;
-	
+	private List<Contact> recipients;
+
 	@Bean
-	Contact sender() {
-		return sender;
+	List<Contact> recipients() {
+		return recipients;
 	}
 
 }
